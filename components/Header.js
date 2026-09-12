@@ -89,12 +89,22 @@ export default function Header() {
             </Link>
           )}
           <a
-            href="https://t.me/"
+            href="https://zalo.me/0788836968"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3.5 py-1.5 rounded-full text-muted-gray hover:text-ink-black transition-colors inline-flex items-center gap-1 tracking-shop-body text-xs"
+            className="px-3 py-1.5 rounded-full text-muted-gray hover:text-[#0068FF] transition-colors inline-flex items-center gap-1.5 tracking-shop-body text-xs"
           >
-            Hỗ trợ ↗
+            <span className="w-1.5 h-1.5 rounded-full bg-[#0068FF]"></span>
+            <span>Zalo</span>
+          </a>
+          <a
+            href="https://www.facebook.com/thanthan1011"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 rounded-full text-muted-gray hover:text-[#1877F2] transition-colors inline-flex items-center gap-1.5 tracking-shop-body text-xs"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#1877F2]"></span>
+            <span>Facebook ↗</span>
           </a>
         </nav>
 
@@ -222,7 +232,6 @@ export default function Header() {
               >
                 Bảng điều khiển
               </Link>
-
               <Link
                 href="/dashboard/orders"
                 onClick={() => setMenuOpen(false)}
@@ -247,6 +256,36 @@ export default function Header() {
               Đăng nhập / Đăng ký
             </Link>
           )}
+
+          <div className="pt-3 pb-1 border-t border-faint-border space-y-1.5">
+            <div className="text-[11px] font-semibold text-muted-gray px-4 uppercase tracking-wider">
+              Liên hệ hỗ trợ
+            </div>
+            <a
+              href="https://zalo.me/0788836968"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between px-4 py-2.5 rounded-full bg-[#0068FF]/5 hover:bg-[#0068FF]/10 text-[#0068FF] font-medium transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#0068FF]"></span>
+                <span>Zalo: 0788836968</span>
+              </div>
+              <span className="text-xs font-semibold">Nhắn tin ↗</span>
+            </a>
+            <a
+              href="https://www.facebook.com/thanthan1011"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between px-4 py-2.5 rounded-full bg-[#1877F2]/5 hover:bg-[#1877F2]/10 text-[#1877F2] font-medium transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#1877F2]"></span>
+                <span>Facebook cá nhân</span>
+              </div>
+              <span className="text-xs font-semibold">Ghé thăm ↗</span>
+            </a>
+          </div>
         </div>
       )}
     </header>

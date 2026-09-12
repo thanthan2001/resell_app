@@ -91,12 +91,25 @@ export default function Footer() {
             <ul className="space-y-2.5">
               <li>
                 <a
-                  href="https://t.me/"
+                  href="https://zalo.me/0788836968"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-ink-black transition-colors inline-flex items-center gap-1.5"
+                  className="hover:text-[#0068FF] transition-colors inline-flex items-center gap-1.5 font-medium"
                 >
-                  <span>Kênh Telegram hỗ trợ</span>
+                  <span className="w-2 h-2 rounded-full bg-[#0068FF]"></span>
+                  <span>Zalo: 0788836968</span>
+                  <span className="text-[10px]">↗</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.facebook.com/thanthan1011"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[#1877F2] transition-colors inline-flex items-center gap-1.5 font-medium"
+                >
+                  <span className="w-2 h-2 rounded-full bg-[#1877F2]"></span>
+                  <span>Facebook cá nhân</span>
                   <span className="text-[10px]">↗</span>
                 </a>
               </li>

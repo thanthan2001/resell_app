@@ -269,11 +269,17 @@ export default function ProductDetailPage({ params }) {
                     <div className="text-[10px] text-muted-gray uppercase">Bảo hành</div>
                     <div className="text-xs font-semibold text-[#10a37f] mt-0.5">1-đổi-1 trọn gói</div>
                   </div>
-                  <div className="px-2">
+                  <a
+                    href="https://zalo.me/0788836968"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-2 hover:opacity-80 transition-opacity block cursor-pointer"
+                    title="Liên hệ Zalo 0788836968 hoặc Facebook hỗ trợ 24/7"
+                  >
                     <div className="text-base mb-1">💬</div>
                     <div className="text-[10px] text-muted-gray uppercase">Hỗ trợ</div>
-                    <div className="text-xs font-semibold text-shop-violet mt-0.5">Telegram 24/7</div>
-                  </div>
+                    <div className="text-xs font-semibold text-shop-violet mt-0.5">Zalo / FB 24/7</div>
+                  </a>
                 </div>
               </div>
             </div>

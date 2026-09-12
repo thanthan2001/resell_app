@@ -263,7 +263,7 @@ export default function HomePage() {
                   Hỗ Trợ Tận Tâm
                 </h4>
                 <p className="text-xs text-muted-gray leading-relaxed">
-                  Kênh Telegram tiếp nhận và xử lý sự cố mọi lúc, hướng dẫn cài đặt chi tiết cho người mới.
+                  Hỗ trợ qua Zalo (0788836968) và Facebook 24/7, tiếp nhận và xử lý sự cố tức thì, hướng dẫn cài đặt chi tiết.
                 </p>
               </div>
             </div>
@@ -306,7 +306,7 @@ export default function HomePage() {
                   Nếu trong quá trình sử dụng gặp lỗi thì sao?
                 </h4>
                 <p className="text-xs text-muted-gray leading-relaxed">
-                  Mọi sản phẩm đều có chính sách bảo hành rõ ràng. Bạn chỉ cần nhắn mã đơn hàng cho đội ngũ hỗ trợ qua kênh Telegram, chúng tôi sẽ kiểm tra và khắc phục hoặc đổi mới cho bạn trong thời gian sớm nhất.
+                  Mọi sản phẩm đều có chính sách bảo hành rõ ràng. Bạn chỉ cần nhắn mã đơn hàng cho đội ngũ hỗ trợ qua Zalo (0788836968) hoặc Facebook, chúng tôi sẽ kiểm tra và khắc phục hoặc đổi mới cho bạn trong thời gian sớm nhất.
                 </p>
               </div>
             </div>

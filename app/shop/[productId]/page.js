@@ -323,9 +323,43 @@ export default function ProductDetailPage({ params }) {
 
               {/* Variant Selector */}
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-ink-black mb-3">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-ink-black mb-2.5">
                   Chọn phiên bản / Gói cước ({groupVariants.length} lựa chọn)
                 </label>
+
+                {/* DÒNG THÔNG BÁO MÀU ĐỎ TO VÀ RÕ CHO SẢN PHẨM HẾT HÀNG */}
+                <div className="mb-4 p-4 rounded-2xl bg-red-50 border-2 border-red-400 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl flex-shrink-0 leading-none mt-0.5">📢</span>
+                    <div>
+                      <h3 className="text-sm sm:text-base font-extrabold text-red-600 uppercase tracking-wide">
+                        Đối với các sản phẩm / gói cước HẾT HÀNG:
+                      </h3>
+                      <p className="text-xs sm:text-sm font-bold text-red-700 mt-0.5">
+                        Quý khách có thể nhắn tin trực tiếp cho Admin để được hỗ trợ mua sớm nhất!
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 pt-1 sm:pt-0">
+                    <a
+                      href="https://zalo.me/0788836968"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 sm:flex-initial px-4 py-2 rounded-full bg-[#0068FF] text-white text-xs font-bold hover:brightness-110 transition-all flex items-center justify-center gap-1.5 shadow-sm"
+                    >
+                      <span>💬 Chat Zalo</span>
+                    </a>
+                    <a
+                      href="https://www.facebook.com/thanthan1011"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 sm:flex-initial px-4 py-2 rounded-full bg-[#1877F2] text-white text-xs font-bold hover:brightness-110 transition-all flex items-center justify-center gap-1.5 shadow-sm"
+                    >
+                      <span>🌐 Facebook</span>
+                    </a>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {groupVariants.map((variant) => {
                     const isSelected = variant.id === product.id
@@ -338,12 +372,11 @@ export default function ProductDetailPage({ params }) {
                         key={variant.id}
                         type="button"
                         onClick={() => handleSelectVariant(variant)}
-                        disabled={!varAvailable}
                         className={`p-4 rounded-2xl border text-left flex flex-col justify-between gap-3 transition-all cursor-pointer ${
                           isSelected
                             ? 'bg-pure-white border-shop-violet shadow-sm ring-1 ring-shop-violet'
                             : 'bg-pure-white border-faint-border hover:border-black/20 shadow-sm'
-                        } ${!varAvailable ? 'opacity-40 cursor-not-allowed bg-canvas-mist' : ''}`}
+                        } ${!varAvailable ? 'bg-red-50/50 border-red-200 hover:border-red-300' : ''}`}
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-2">
@@ -365,8 +398,8 @@ export default function ProductDetailPage({ params }) {
 
                         <div className="flex items-center justify-between text-xs pt-2 border-t border-faint-border">
                           <span className="font-bold text-ink-black">{formatCurrency(varPrice)}</span>
-                          <span className="text-[11px] text-muted-gray">
-                            {varAvailable ? (variant.available ? `Còn ${variant.available}` : 'Sẵn hàng') : 'Hết hàng'}
+                          <span className={`text-[11px] font-semibold ${!varAvailable ? 'text-red-600 font-bold' : 'text-muted-gray'}`}>
+                            {varAvailable ? (variant.available ? `Còn ${variant.available}` : 'Sẵn hàng') : '● Hết hàng (Nhắn Admin)'}
                           </span>
                         </div>
                       </button>
@@ -532,20 +565,33 @@ export default function ProductDetailPage({ params }) {
 
                 {/* Buy Button or Result Display */}
                 {!result ? (
-                  <button
-                    type="button"
-                    onClick={handleBuy}
-                    disabled={!isAvailable}
-                    className="shop-pill-btn shop-btn-violet w-full py-3.5 text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed shadow-lg-2"
-                  >
-                    {!user ? (
-                      '🔐 Đăng nhập để Mua ngay'
-                    ) : !isAvailable ? (
-                      '✕ Tạm hết hàng'
-                    ) : (
-                      '⚡ Thanh toán VietQR ngay'
-                    )}
-                  </button>
+                  !isAvailable ? (
+                    <div className="space-y-2">
+                      <a
+                        href="https://zalo.me/0788836968"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shop-pill-btn bg-red-600 hover:bg-red-700 text-white w-full py-3.5 text-sm font-bold flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer"
+                      >
+                        <span>✕ Tạm hết hàng — Nhắn Zalo Admin để mua sớm ↗</span>
+                      </a>
+                      <p className="text-center text-xs font-bold text-red-600">
+                        * Gói cước đang tạm hết hàng. Quý khách vui lòng nhắn tin Zalo: 0788836968 để Admin kích hoạt riêng!
+                      </p>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleBuy}
+                      className="shop-pill-btn shop-btn-violet w-full py-3.5 text-sm font-semibold shadow-lg-2"
+                    >
+                      {!user ? (
+                        '🔐 Đăng nhập để Mua ngay'
+                      ) : (
+                        '⚡ Thanh toán VietQR ngay'
+                      )}
+                    </button>
+                  )
                 ) : (
                   <div className="p-5 rounded-cards bg-emerald-50 border border-emerald-200 text-xs space-y-3">
                     <div className="flex items-center gap-2 text-[#0b7a55] font-bold text-sm">

@@ -190,13 +190,13 @@ function ShopContent() {
           </div>
         </div>
 
-        {/* Product Grid (Responsive 1-to-4 Columns) */}
+        {/* Product Grid (Responsive 2-to-4 Columns) */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-pure-white rounded-cards p-3 shadow-sm-2 animate-pulse h-80">
-                <div className="w-full aspect-square bg-canvas-mist rounded-inner-img mb-4"></div>
-                <div className="h-4 bg-canvas-mist rounded w-3/4 mb-2"></div>
+              <div key={i} className="bg-pure-white rounded-2xl sm:rounded-cards p-2.5 sm:p-3 shadow-sm-2 animate-pulse h-64 sm:h-80">
+                <div className="w-full aspect-square bg-canvas-mist rounded-xl sm:rounded-inner-img mb-3"></div>
+                <div className="h-3.5 bg-canvas-mist rounded w-3/4 mb-2"></div>
                 <div className="h-3 bg-canvas-mist rounded w-1/2"></div>
               </div>
             ))}
@@ -232,7 +232,7 @@ function ShopContent() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             {filteredGroups.map((group, idx) => (
               <ProductCard key={group.groupId} group={group} index={idx} />
             ))}

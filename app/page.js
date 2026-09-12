@@ -90,20 +90,20 @@ export default function HomePage() {
               </Link>
             </div>
 
-            {/* 4-Column Responsive Grid */}
+            {/* 2-Column Mobile / 4-Column Desktop Responsive Grid */}
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="bg-pure-white rounded-cards p-3 shadow-sm-2 animate-pulse h-80">
-                    <div className="w-full aspect-square bg-canvas-mist rounded-inner-img mb-4"></div>
-                    <div className="h-4 bg-canvas-mist rounded w-3/4 mb-2"></div>
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="bg-pure-white rounded-2xl sm:rounded-cards p-2.5 sm:p-3 shadow-sm-2 animate-pulse h-64 sm:h-80">
+                    <div className="w-full aspect-square bg-canvas-mist rounded-xl sm:rounded-inner-img mb-3"></div>
+                    <div className="h-3.5 bg-canvas-mist rounded w-3/4 mb-2"></div>
                     <div className="h-3 bg-canvas-mist rounded w-1/2"></div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {(aiGroups.length > 0 ? aiGroups : allGroups.slice(0, 4)).map((group, idx) => (
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+                {(aiGroups.length > 0 ? aiGroups.slice(0, 8) : allGroups.slice(0, 8)).map((group, idx) => (
                   <ProductCard key={group.groupId} group={group} index={idx} />
                 ))}
               </div>
@@ -144,18 +144,18 @@ export default function HomePage() {
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="bg-pure-white rounded-cards p-3 shadow-sm-2 animate-pulse h-80">
-                    <div className="w-full aspect-square bg-canvas-mist rounded-inner-img mb-4"></div>
-                    <div className="h-4 bg-canvas-mist rounded w-3/4 mb-2"></div>
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="bg-pure-white rounded-2xl sm:rounded-cards p-2.5 sm:p-3 shadow-sm-2 animate-pulse h-64 sm:h-80">
+                    <div className="w-full aspect-square bg-canvas-mist rounded-xl sm:rounded-inner-img mb-3"></div>
+                    <div className="h-3.5 bg-canvas-mist rounded w-3/4 mb-2"></div>
                     <div className="h-3 bg-canvas-mist rounded w-1/2"></div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {(mediaGroups.length > 0 ? mediaGroups : allGroups.slice(4, 8)).map((group, idx) => (
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+                {(mediaGroups.length > 0 ? mediaGroups.slice(0, 8) : allGroups.slice(4, 12)).map((group, idx) => (
                   <ProductCard key={group.groupId} group={group} index={idx} />
                 ))}
               </div>
@@ -196,18 +196,18 @@ export default function HomePage() {
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="bg-pure-white rounded-cards p-3 shadow-sm-2 animate-pulse h-80">
-                    <div className="w-full aspect-square bg-canvas-mist rounded-inner-img mb-4"></div>
-                    <div className="h-4 bg-canvas-mist rounded w-3/4 mb-2"></div>
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="bg-pure-white rounded-2xl sm:rounded-cards p-2.5 sm:p-3 shadow-sm-2 animate-pulse h-64 sm:h-80">
+                    <div className="w-full aspect-square bg-canvas-mist rounded-xl sm:rounded-inner-img mb-3"></div>
+                    <div className="h-3.5 bg-canvas-mist rounded w-3/4 mb-2"></div>
                     <div className="h-3 bg-canvas-mist rounded w-1/2"></div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {(designOfficeGroups.length > 0 ? designOfficeGroups : allGroups.slice(8, 12)).map((group, idx) => (
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+                {(designOfficeGroups.length > 0 ? designOfficeGroups.slice(0, 8) : allGroups.slice(8, 16)).map((group, idx) => (
                   <ProductCard key={group.groupId} group={group} index={idx} />
                 ))}
               </div>
@@ -218,7 +218,7 @@ export default function HomePage() {
         {/* ================= 4 PILLARS OF ASSURANCE ================= */}
         <section className="py-16 bg-pure-white border-y border-faint-border">
           <div className="shop-container">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
               <div className="flex flex-col items-start space-y-2" data-aos="fade-up" data-aos-delay="0">
                 <div className="w-10 h-10 rounded-full bg-canvas-mist flex items-center justify-center text-lg mb-1">
                   ⚡

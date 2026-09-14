@@ -33,7 +33,7 @@ function LoginForm() {
         email,
         password,
         options: {
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/auth/callback?redirect=${redirect}`,
+          emailRedirectTo: `${process.env.SITE_URL}/auth/callback?redirect=${redirect}`,
         },
       })
       if (error) {

@@ -3,7 +3,7 @@ import AOSProvider from '@/components/AOSProvider'
 import FloatingContact from '@/components/FloatingContact'
 
 export const metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://socialtech.vn'),
+  metadataBase: new URL(process.env.SITE_URL || 'https://socialtech.vn'),
   title: {
     default: 'socialTech — Tài Khoản & Key Bản Quyền AI Chính Hãng',
     template: '%s | socialTech',

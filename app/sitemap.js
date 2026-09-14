@@ -1,7 +1,7 @@
 import { getCatalog } from '@/lib/source-api'
 
 export default async function sitemap() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://socialtech.vn'
+  const baseUrl = process.env.SITE_URL || 'https://socialtech.vn'
 
   const routes = [
     {

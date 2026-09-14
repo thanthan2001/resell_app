@@ -171,6 +171,7 @@ export default function AdminLayout({ children }) {
     { href: '/admin', label: '📊 Tổng quan', exact: true },
     { href: '/admin/orders', label: '📦 Quản lý đơn hàng', exact: false },
     { href: '/admin/deposits', label: '💰 Lịch sử nạp tiền', exact: false },
+    { href: '/admin/users', label: '👥 Quản lý thành viên', exact: false },
   ]
 
   return (

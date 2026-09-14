@@ -5,12 +5,14 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { formatCurrency, formatDate } from '@/lib/utils'
 
+
 export default function AdminOverviewPage() {
   const [stats, setStats] = useState({
     pendingOrders: 0,
     totalUsers: 0,
     totalOrders: 0,
     totalRevenue: 0,
+    pendingUsers: 0,
   })
   const [recentPending, setRecentPending] = useState([])
   const [loading, setLoading] = useState(true)
@@ -50,11 +52,24 @@ export default function AdminOverviewPage() {
         .order('created_at', { ascending: false })
         .limit(5)
 
+      // Fetch pending users count
+      let pendingUsersCount = 0
+      try {
+        const usersRes = await fetch('/api/admin/users?filter=unverified')
+        const usersData = await usersRes.json()
+        if (usersRes.ok) {
+          pendingUsersCount = usersData.stats?.unverifiedCount || 0
+        }
+      } catch (e) {
+        console.error('Failed to fetch pending users:', e)
+      }
+
       setStats({
         pendingOrders: pendingOrders || 0,
         totalUsers: totalUsers || 0,
         totalOrders: totalOrders || 0,
         totalRevenue,
+        pendingUsers: pendingUsersCount,
       })
       setRecentPending(pendingList || [])
     } catch (err) {
@@ -89,8 +104,8 @@ export default function AdminOverviewPage() {
         </Link>
       </div>
 
-      {/* 4 Metric Cards (Refero 28px Radius) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* 5 Metric Cards (Refero 28px Radius) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Pending Orders */}
         <div
           className={`p-6 bg-pure-white rounded-cards shadow-sm-2 border transition-all ${
@@ -111,6 +126,33 @@ export default function AdminOverviewPage() {
           </div>
           <p className="text-[11px] text-muted-gray mt-2">
             {stats.pendingOrders > 0 ? 'Có đơn hàng đang chờ bạn kiểm tra' : 'Không có đơn chờ duyệt'}
+          </p>
+        </div>
+
+        {/* Pending Users */}
+        <div
+          className={`p-6 bg-pure-white rounded-cards shadow-sm-2 border transition-all ${
+            stats.pendingUsers > 0
+              ? 'border-shop-violet ring-2 ring-shop-violet/20'
+              : 'border-faint-border'
+          }`}
+          style={{ borderRadius: '28px' }}
+        >
+          <div className="flex items-center justify-between text-xs text-muted-gray mb-3">
+            <span>Chờ duyệt TK</span>
+            <span className="w-8 h-8 rounded-full bg-shop-violet/10 text-shop-violet flex items-center justify-center text-sm">
+              👥
+            </span>
+          </div>
+          <div className="text-3xl font-bold tracking-shop-display text-shop-violet">
+            {loading ? '—' : stats.pendingUsers}
+          </div>
+          <p className="text-[11px] text-muted-gray mt-2">
+            {stats.pendingUsers > 0 ? (
+              <Link href="/admin/users" className="text-shop-violet hover:underline font-semibold">
+                Duyệt ngay →
+              </Link>
+            ) : 'Không có TK chờ duyệt'}
           </p>
         </div>
 

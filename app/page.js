@@ -61,7 +61,7 @@ export default function HomePage() {
         <section className="py-12 sm:py-16">
           <div className="shop-container">
             {/* Category Section Header with Chevron */}
-            <div className="flex items-center justify-between mb-8" data-aos="fade-up">
+            <div className="flex items-center justify-between mb-8" data-aos="fade-up" suppressHydrationWarning>
               <Link
                 href="/shop?category=chatgpt"
                 className="shop-section-header group"
@@ -114,7 +114,7 @@ export default function HomePage() {
         {/* ================= SECTION 2: VIDEO & VOICE AI GENERATION ================= */}
         <section className="py-12 sm:py-16">
           <div className="shop-container">
-            <div className="flex items-center justify-between mb-8" data-aos="fade-up">
+            <div className="flex items-center justify-between mb-8" data-aos="fade-up" suppressHydrationWarning>
               <Link
                 href="/shop?category=veo3"
                 className="shop-section-header group"
@@ -166,7 +166,7 @@ export default function HomePage() {
         {/* ================= SECTION 3: THIẾT KẾ, VĂN PHÒNG & BẢO MẬT ================= */}
         <section className="py-12 sm:py-16">
           <div className="shop-container">
-            <div className="flex items-center justify-between mb-8" data-aos="fade-up">
+            <div className="flex items-center justify-between mb-8" data-aos="fade-up" suppressHydrationWarning>
               <Link
                 href="/shop?category=canva"
                 className="shop-section-header group"
@@ -219,7 +219,7 @@ export default function HomePage() {
         <section className="py-16 bg-pure-white border-y border-faint-border">
           <div className="shop-container">
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
-              <div className="flex flex-col items-start space-y-2" data-aos="fade-up" data-aos-delay="0">
+              <div className="flex flex-col items-start space-y-2" data-aos="fade-up" data-aos-delay="0" suppressHydrationWarning>
                 <div className="w-10 h-10 rounded-full bg-canvas-mist flex items-center justify-center text-lg mb-1">
                   ⚡
                 </div>
@@ -231,7 +231,7 @@ export default function HomePage() {
                 </p>
               </div>
 
-              <div className="flex flex-col items-start space-y-2" data-aos="fade-up" data-aos-delay="100">
+              <div className="flex flex-col items-start space-y-2" data-aos="fade-up" data-aos-delay="100" suppressHydrationWarning>
                 <div className="w-10 h-10 rounded-full bg-canvas-mist flex items-center justify-center text-lg mb-1">
                   🛡️
                 </div>
@@ -243,7 +243,7 @@ export default function HomePage() {
                 </p>
               </div>
 
-              <div className="flex flex-col items-start space-y-2" data-aos="fade-up" data-aos-delay="200">
+              <div className="flex flex-col items-start space-y-2" data-aos="fade-up" data-aos-delay="200" suppressHydrationWarning>
                 <div className="w-10 h-10 rounded-full bg-canvas-mist flex items-center justify-center text-lg mb-1">
                   💳
                 </div>
@@ -255,7 +255,7 @@ export default function HomePage() {
                 </p>
               </div>
 
-              <div className="flex flex-col items-start space-y-2" data-aos="fade-up" data-aos-delay="300">
+              <div className="flex flex-col items-start space-y-2" data-aos="fade-up" data-aos-delay="300" suppressHydrationWarning>
                 <div className="w-10 h-10 rounded-full bg-canvas-mist flex items-center justify-center text-lg mb-1">
                   💬
                 </div>
@@ -273,7 +273,7 @@ export default function HomePage() {
         {/* ================= FAQ SECTION ================= */}
         <section className="py-16 sm:py-20">
           <div className="shop-container max-w-3xl">
-            <div className="text-center mb-10" data-aos="fade-up">
+            <div className="text-center mb-10" data-aos="fade-up" suppressHydrationWarning>
               <h2 className="text-2xl font-semibold tracking-shop-display text-ink-black mb-2">
                 Câu Hỏi Thường Gặp
               </h2>
@@ -283,7 +283,7 @@ export default function HomePage() {
             </div>
 
             <div className="space-y-4">
-              <div className="bg-pure-white rounded-cards p-6 shadow-sm-2 border border-faint-border" data-aos="fade-up" data-aos-delay="50">
+              <div className="bg-pure-white rounded-cards p-6 shadow-sm-2 border border-faint-border" data-aos="fade-up" data-aos-delay="50" suppressHydrationWarning>
                 <h4 className="text-sm font-semibold text-ink-black tracking-shop-body mb-2">
                   Sau khi thanh toán tôi nhận sản phẩm như thế nào?
                 </h4>
@@ -292,7 +292,7 @@ export default function HomePage() {
                 </p>
               </div>
 
-              <div className="bg-pure-white rounded-cards p-6 shadow-sm-2 border border-faint-border" data-aos="fade-up" data-aos-delay="100">
+              <div className="bg-pure-white rounded-cards p-6 shadow-sm-2 border border-faint-border" data-aos="fade-up" data-aos-delay="100" suppressHydrationWarning>
                 <h4 className="text-sm font-semibold text-ink-black tracking-shop-body mb-2">
                   Đối với các gói nâng cấp chính chủ, tôi cần cung cấp gì?
                 </h4>
@@ -301,7 +301,7 @@ export default function HomePage() {
                 </p>
               </div>
 
-              <div className="bg-pure-white rounded-cards p-6 shadow-sm-2 border border-faint-border" data-aos="fade-up" data-aos-delay="150">
+              <div className="bg-pure-white rounded-cards p-6 shadow-sm-2 border border-faint-border" data-aos="fade-up" data-aos-delay="150" suppressHydrationWarning>
                 <h4 className="text-sm font-semibold text-ink-black tracking-shop-body mb-2">
                   Nếu trong quá trình sử dụng gặp lỗi thì sao?
                 </h4>
@@ -312,7 +312,7 @@ export default function HomePage() {
             </div>
 
             {/* Bottom Final CTA */}
-            <div className="mt-12 text-center" data-aos="zoom-in" data-aos-delay="200">
+            <div className="mt-12 text-center" data-aos="zoom-in" data-aos-delay="200" suppressHydrationWarning>
               <Link
                 href="/shop"
                 className="shop-pill-btn shop-btn-violet py-3.5 px-8 text-sm"

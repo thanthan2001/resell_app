@@ -14,29 +14,38 @@ export default function AdminOrdersPage() {
   const [submitting, setSubmitting] = useState(false)
   const [feedbackMsg, setFeedbackMsg] = useState('')
   const [copiedCode, setCopiedCode] = useState(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const PAGE_SIZE = 20
   const supabase = createClient()
 
-  const loadOrders = async () => {
+  const loadOrders = async (page = currentPage) => {
     setLoading(true)
+    const from = (page - 1) * PAGE_SIZE
+    const to = from + PAGE_SIZE - 1
+
     let query = supabase
       .from('orders')
-      .select('*, profiles!orders_user_id_fkey(display_name, email)')
+      .select('*, profiles!orders_user_id_fkey(display_name, email)', { count: 'exact' })
       .order('created_at', { ascending: false })
+      .range(from, to)
 
     if (filter !== 'all') {
       query = query.eq('status', filter)
     }
 
-    const { data, error } = await query
+    const { data, error, count } = await query
     if (error) {
       console.error('Error fetching orders:', error)
     }
     setOrders(data || [])
+    setTotalCount(count || 0)
     setLoading(false)
   }
 
   useEffect(() => {
-    loadOrders()
+    setCurrentPage(1)
+    loadOrders(1)
   }, [filter])
 
   const handleCopy = (text) => {
@@ -115,6 +124,13 @@ export default function AdminOrdersPage() {
     const name = (o.product_name || '').toLowerCase()
     return code.includes(term) || email.includes(term) || name.includes(term)
   })
+
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE)
+
+  const goToPage = (page) => {
+    setCurrentPage(page)
+    loadOrders(page)
+  }
 
   return (
     <div className="space-y-6 animate-fade-in font-sans">
@@ -306,6 +322,59 @@ export default function AdminOrdersPage() {
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <span className="text-xs text-muted-gray">
+            Trang {currentPage}/{totalPages} — {totalCount} đơn hàng tổng
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => goToPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+              className="w-9 h-9 rounded-full bg-pure-white border border-faint-border shadow-sm text-xs font-medium text-ink-black hover:bg-canvas-mist transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
+              aria-label="Trang trước"
+            >
+              ‹
+            </button>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+              .reduce((acc, p, idx, arr) => {
+                if (idx > 0 && p - arr[idx - 1] > 1) acc.push('…')
+                acc.push(p)
+                return acc
+              }, [])
+              .map((item, idx) =>
+                item === '…' ? (
+                  <span key={`ellipsis-${idx}`} className="text-xs text-muted-gray px-1">…</span>
+                ) : (
+                  <button
+                    key={item}
+                    onClick={() => goToPage(item)}
+                    className={`w-9 h-9 rounded-full text-xs font-semibold transition-all ${
+                      item === currentPage
+                        ? 'bg-shop-violet text-white shadow-sm'
+                        : 'bg-pure-white border border-faint-border text-ink-black hover:bg-canvas-mist'
+                    }`}
+                  >
+                    {item}
+                  </button>
+                )
+              )}
+
+            <button
+              onClick={() => goToPage(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+              className="w-9 h-9 rounded-full bg-pure-white border border-faint-border shadow-sm text-xs font-medium text-ink-black hover:bg-canvas-mist transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
+              aria-label="Trang tiếp"
+            >
+              ›
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Modal Duyệt & Cấp Tài Khoản Thủ Công */}
       {activeModalOrder && (

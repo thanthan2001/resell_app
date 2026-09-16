@@ -16,6 +16,7 @@ export default function ProductCard({ group, index = 0 }) {
       href={defaultHref}
       data-aos="fade-up"
       data-aos-delay={delay}
+      suppressHydrationWarning
       className="group block bg-pure-white rounded-2xl sm:rounded-cards shadow-sm-2 hover:shadow-lg transition-all duration-300 p-2 sm:p-3 flex flex-col justify-between product-card-hover active:scale-[0.98]"
     >
       {/* 1:1 Image Frame with inner radius */}

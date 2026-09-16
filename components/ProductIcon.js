@@ -129,7 +129,7 @@ export default function ProductIcon({
     )
   }
 
-  // Priority 2: Custom seller image (if not a generic CanBoSo placeholder)
+  // Priority 2: Custom seller image (if not a generic placeholder)
   if (image && !customErr && !image.includes('product-default-images')) {
     return (
       <img

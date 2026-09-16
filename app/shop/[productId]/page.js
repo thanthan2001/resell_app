@@ -218,7 +218,7 @@ export default function ProductDetailPage({ params }) {
           {/* Main 2-Column Product Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             {/* Left Column (5 cols): Visual Showcase & Assurance */}
-            <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24" data-aos="fade-right">
+            <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24" data-aos="fade-right" suppressHydrationWarning>
               {/* Image Box: 28px Card with 20px Inner Image */}
               <div className="bg-pure-white rounded-cards shadow-sm-2 p-4 border border-faint-border">
                 <div
@@ -285,7 +285,7 @@ export default function ProductDetailPage({ params }) {
             </div>
 
             {/* Right Column (7 cols): Details, Variant Selection & Order Flow */}
-            <div className="lg:col-span-7 space-y-6" data-aos="fade-left">
+            <div className="lg:col-span-7 space-y-6" data-aos="fade-left" suppressHydrationWarning>
               {/* Product Header */}
               <div>
                 <span className="inline-block text-xs font-medium text-shop-violet mb-2">

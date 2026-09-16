@@ -7,7 +7,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
 import SearchInput from '@/components/SearchInput'
-import CategoryPills from '@/components/CategoryPills'
+import CategoryPills, { SHOP_CATEGORIES } from '@/components/CategoryPills'
 import { groupProducts } from '@/lib/utils'
 
 function ShopContent() {
@@ -18,6 +18,8 @@ function ShopContent() {
   const [onlyInStock, setOnlyInStock] = useState(false)
   const [sortBy, setSortBy] = useState('priority')
   const [error, setError] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const PAGE_SIZE = 12
 
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -87,6 +89,11 @@ function ShopContent() {
     return result
   }, [productGroups, search, selectedCategory, onlyInStock, sortBy])
 
+  // Reset to page 1 whenever filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [search, selectedCategory, onlyInStock, sortBy])
+
   const handleCategorySelect = (catId) => {
     setSelectedCategory(catId)
     const params = new URLSearchParams(window.location.search)
@@ -122,7 +129,7 @@ function ShopContent() {
         </nav>
 
         {/* Discovery Hero: Search & Title */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-faint-border mb-8" data-aos="fade-up">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-faint-border mb-8 animate-fade-in-up">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-pure-white border border-faint-border shadow-sm text-ink-black mb-3">
               <span className="w-2 h-2 rounded-full bg-shop-violet"></span>
@@ -147,7 +154,7 @@ function ShopContent() {
         </div>
 
         {/* Category Pills Strip */}
-        <div className="mb-8" data-aos="fade-up" data-aos-delay="50">
+        <div className="mb-8 animate-fade-in-up">
           <CategoryPills
             selectedId={selectedCategory}
             onSelect={handleCategorySelect}
@@ -156,9 +163,25 @@ function ShopContent() {
         </div>
 
         {/* Controls & Filter Strip */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-pure-white border border-faint-border rounded-cards shadow-sm mb-8 text-xs text-muted-gray" data-aos="fade-up" data-aos-delay="100">
-          <div>
-            Hiển thị <strong className="text-ink-black font-semibold">{filteredGroups.length}</strong> sản phẩm phù hợp
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-pure-white border border-faint-border rounded-cards shadow-sm mb-8 text-xs text-muted-gray animate-fade-in-up">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span>
+              Hiển thị <strong className="text-ink-black font-semibold">{Math.min(currentPage * PAGE_SIZE, filteredGroups.length)}</strong> / <strong className="text-ink-black font-semibold">{filteredGroups.length}</strong> sản phẩm
+            </span>
+            {selectedCategory !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-shop-violet/10 text-shop-violet text-[11px] font-medium animate-fade-in">
+                <span>Đang lọc: {SHOP_CATEGORIES.find((c) => c.id === selectedCategory)?.name || selectedCategory}</span>
+                <button
+                  type="button"
+                  onClick={() => handleCategorySelect('all')}
+                  className="hover:opacity-70 font-bold cursor-pointer ml-0.5"
+                  title="Xóa bộ lọc danh mục"
+                  aria-label="Xóa bộ lọc danh mục"
+                >
+                  ✕
+                </button>
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-6">
@@ -232,11 +255,50 @@ function ShopContent() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-            {filteredGroups.map((group, idx) => (
-              <ProductCard key={group.groupId} group={group} index={idx} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+              {filteredGroups.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE).map((group, idx) => (
+                <ProductCard key={group.groupId} group={group} index={idx} />
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            {filteredGroups.length > PAGE_SIZE && (
+              <div className="flex items-center justify-center gap-2 mt-10">
+                <button
+                  onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                  disabled={currentPage === 1}
+                  className="w-9 h-9 rounded-full bg-pure-white border border-faint-border shadow-sm text-xs font-medium text-ink-black hover:bg-canvas-mist transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
+                  aria-label="Trang trước"
+                >
+                  ‹
+                </button>
+
+                {Array.from({ length: Math.ceil(filteredGroups.length / PAGE_SIZE) }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => { setCurrentPage(page); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                    className={`w-9 h-9 rounded-full text-xs font-semibold transition-all ${
+                      page === currentPage
+                        ? 'bg-shop-violet text-white shadow-sm'
+                        : 'bg-pure-white border border-faint-border text-ink-black hover:bg-canvas-mist'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+
+                <button
+                  onClick={() => { setCurrentPage(p => Math.min(Math.ceil(filteredGroups.length / PAGE_SIZE), p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                  disabled={currentPage === Math.ceil(filteredGroups.length / PAGE_SIZE)}
+                  className="w-9 h-9 rounded-full bg-pure-white border border-faint-border shadow-sm text-xs font-medium text-ink-black hover:bg-canvas-mist transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
+                  aria-label="Trang tiếp"
+                >
+                  ›
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </main>

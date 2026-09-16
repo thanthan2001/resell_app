@@ -35,6 +35,7 @@ export default function HeroConstellation({ featuredGroups = [] }) {
                   href={`/shop/${item.defaultProductId}`}
                   data-aos="zoom-in"
                   data-aos-delay={idx * 100}
+                  suppressHydrationWarning
                   className={`absolute ${positions[idx % positions.length]} z-10 w-44 bg-pure-white rounded-cards p-2.5 shadow-sm-2 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2.5 hover:scale-105 cursor-pointer constellation-float-${(idx % 4) + 1}`}
                   style={{ borderRadius: '24px' }}
                 >
@@ -65,7 +66,7 @@ export default function HeroConstellation({ featuredGroups = [] }) {
         )}
 
         {/* Centerpiece: Wordmark with Violet Dot */}
-        <div className="text-center max-w-2xl mx-auto mt-4 mb-6" data-aos="fade-up">
+        <div className="text-center max-w-2xl mx-auto mt-4 mb-6" data-aos="fade-up" suppressHydrationWarning>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pure-white border border-faint-border shadow-sm text-xs text-muted-gray mb-4">
             <span className="w-2 h-2 rounded-full bg-shop-violet"></span>
             <span>Kho tài khoản & bản quyền AI số 1</span>
@@ -80,7 +81,7 @@ export default function HeroConstellation({ featuredGroups = [] }) {
         </div>
 
         {/* Signature Refero Pill Search Bar */}
-        <div className="max-w-xl mx-auto mb-8" data-aos="fade-up" data-aos-delay="100">
+        <div className="max-w-xl mx-auto mb-8" data-aos="fade-up" data-aos-delay="100" suppressHydrationWarning>
           <SearchInput
             placeholder="Bạn đang tìm kiếm tài khoản hay công cụ nào hôm nay?"
             className="w-full"
@@ -88,7 +89,7 @@ export default function HeroConstellation({ featuredGroups = [] }) {
         </div>
 
         {/* Category Pill Strip Directly Below Search */}
-        <div className="flex justify-center max-w-4xl mx-auto" data-aos="fade-up" data-aos-delay="150">
+        <div className="flex justify-center max-w-4xl mx-auto" data-aos="fade-up" data-aos-delay="150" suppressHydrationWarning>
           <CategoryPills isNavigation={true} className="justify-center" />
         </div>
       </div>

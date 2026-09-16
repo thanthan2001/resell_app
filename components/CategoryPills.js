@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useMemo } from 'react'
 import Link from 'next/link'
 
 export const SHOP_CATEGORIES = [
@@ -32,11 +33,35 @@ export default function CategoryPills({
   counts = {},
   isNavigation = false,
   className = '',
+  initialLimit = 9,
+  collapsible = true,
 }) {
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  // Visible categories calculation
+  const visibleCategories = useMemo(() => {
+    if (!collapsible || isExpanded) {
+      return SHOP_CATEGORIES
+    }
+
+    const initialSlice = SHOP_CATEGORIES.slice(0, initialLimit)
+    // If selectedId is outside the initial slice, ensure it's displayed so active state is always visible
+    if (selectedId && selectedId !== 'all' && !initialSlice.some((c) => c.id === selectedId)) {
+      const selectedCat = SHOP_CATEGORIES.find((c) => c.id === selectedId)
+      if (selectedCat) {
+        return [...initialSlice, selectedCat]
+      }
+    }
+    return initialSlice
+  }, [collapsible, isExpanded, initialLimit, selectedId])
+
+  const hiddenCount = Math.max(0, SHOP_CATEGORIES.length - visibleCategories.length)
+  const isCentered = className.includes('justify-center')
+
   return (
-    <div className={`overflow-x-auto scrollbar-none py-1 -my-1 ${className}`}>
-      <div className="inline-flex items-center gap-2.5 min-w-full sm:min-w-0">
-        {SHOP_CATEGORIES.map((cat) => {
+    <div className={`w-full ${className}`}>
+      <div className={`flex flex-wrap items-center gap-2 sm:gap-2.5 transition-all duration-300 ease-in-out ${isCentered ? 'justify-center' : ''}`}>
+        {visibleCategories.map((cat) => {
           const isActive = selectedId === cat.id
           const count = counts[cat.id]
 
@@ -58,8 +83,10 @@ export default function CategoryPills({
               </span>
               {count !== undefined && (
                 <span
-                  className={`text-[11px] px-2 py-0.5 rounded-full ${
-                    isActive ? 'bg-white/20 text-white' : 'bg-canvas-mist text-muted-gray'
+                  className={`text-[11px] px-2 py-0.5 rounded-full transition-colors ${
+                    isActive
+                      ? 'bg-white/20 text-white'
+                      : 'bg-canvas-mist text-muted-gray group-hover:bg-faint-border group-hover:text-ink-black'
                   }`}
                 >
                   {count}
@@ -73,7 +100,7 @@ export default function CategoryPills({
               <Link
                 key={cat.id}
                 href={cat.id === 'all' ? '/shop' : `/shop?category=${cat.id}`}
-                className={`shop-category-chip ${isActive ? 'active' : ''}`}
+                className={`shop-category-chip group ${isActive ? 'active' : ''}`}
               >
                 {content}
               </Link>
@@ -85,13 +112,88 @@ export default function CategoryPills({
               key={cat.id}
               type="button"
               onClick={() => onSelect && onSelect(cat.id)}
-              className={`shop-category-chip cursor-pointer ${isActive ? 'active' : ''}`}
+              className={`shop-category-chip group cursor-pointer ${isActive ? 'active' : ''}`}
             >
               {content}
             </button>
           )
         })}
+
+        {/* Action Toggle / Explore Button */}
+        {collapsible && (
+          <>
+            {isNavigation ? (
+              // For navigation mode (e.g. Home page Hero): Direct link to /shop catalog
+              <Link
+                href="/shop"
+                className="shop-category-chip group hover:border-shop-violet/40 hover:text-shop-violet cursor-pointer transition-all duration-200"
+                title="Khám phá toàn bộ danh mục sản phẩm"
+              >
+                <span className="w-5 h-5 rounded-full bg-shop-violet/10 text-shop-violet flex items-center justify-center text-xs font-bold transition-transform group-hover:scale-110">
+                  +
+                </span>
+                <span className="font-medium tracking-shop-body text-shop-violet whitespace-nowrap">
+                  Xem tất cả ({SHOP_CATEGORIES.length - 1}+ dịch vụ)
+                </span>
+                <svg
+                  className="w-3.5 h-3.5 text-shop-violet transition-transform group-hover:translate-x-0.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            ) : !isExpanded && hiddenCount > 0 ? (
+              // Collapsed state: Show More button
+              <button
+                type="button"
+                onClick={() => setIsExpanded(true)}
+                className="shop-category-chip group hover:border-shop-violet/30 hover:text-shop-violet cursor-pointer transition-all duration-200"
+                aria-expanded={false}
+                aria-label={`Xem thêm ${hiddenCount} danh mục`}
+              >
+                <span className="w-5 h-5 rounded-full bg-shop-violet/10 text-shop-violet flex items-center justify-center text-xs font-bold transition-transform group-hover:scale-110">
+                  +
+                </span>
+                <span className="font-medium tracking-shop-body whitespace-nowrap text-ink-black group-hover:text-shop-violet">
+                  Xem thêm ({hiddenCount})
+                </span>
+                <svg
+                  className="w-3.5 h-3.5 text-muted-gray group-hover:text-shop-violet transition-transform group-hover:translate-y-0.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            ) : isExpanded ? (
+              // Expanded state: Collapse button
+              <button
+                type="button"
+                onClick={() => setIsExpanded(false)}
+                className="shop-category-chip group hover:border-black/20 text-muted-gray hover:text-ink-black cursor-pointer transition-all duration-200"
+                aria-expanded={true}
+                aria-label="Thu gọn danh mục"
+              >
+                <span className="font-medium tracking-shop-body whitespace-nowrap">
+                  Thu gọn
+                </span>
+                <svg
+                  className="w-3.5 h-3.5 text-muted-gray group-hover:text-ink-black transition-transform group-hover:-translate-y-0.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                </svg>
+              </button>
+            ) : null}
+          </>
+        )}
       </div>
     </div>
   )
 }
+

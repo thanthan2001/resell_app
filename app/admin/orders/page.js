@@ -132,19 +132,18 @@ export default function AdminOrdersPage() {
         {/* Filter Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto p-1 bg-pure-white rounded-pill border border-faint-border shadow-sm">
           {[
-            { id: 'pending', label: '⏳ Chờ duyệt' },
             { id: 'all', label: 'Tất cả' },
+            { id: 'pending', label: '⏳ Chờ duyệt' },
             { id: 'delivered', label: '✓ Đã giao' },
             { id: 'failed', label: '✗ Đã hủy' },
           ].map((f) => (
             <button
               key={f.id}
               onClick={() => setFilter(f.id)}
-              className={`px-3.5 py-1.5 rounded-pill text-xs font-medium tracking-shop-body transition-colors whitespace-nowrap ${
-                filter === f.id
-                  ? 'bg-shop-violet text-white shadow-sm'
-                  : 'text-muted-gray hover:text-ink-black'
-              }`}
+              className={`px-3.5 py-1.5 rounded-pill text-xs font-medium tracking-shop-body transition-colors whitespace-nowrap ${filter === f.id
+                ? 'bg-shop-violet text-white shadow-sm'
+                : 'text-muted-gray hover:text-ink-black'
+                }`}
             >
               {f.label}
             </button>

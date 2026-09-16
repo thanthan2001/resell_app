@@ -1,6 +1,7 @@
 import './globals.css'
 import AOSProvider from '@/components/AOSProvider'
 import FloatingContact from '@/components/FloatingContact'
+import TopProgressBar from '@/components/TopProgressBar'
 
 export const metadata = {
   metadataBase: new URL(process.env.SITE_URL || 'https://socialtech.vn'),
@@ -61,6 +62,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="min-h-screen bg-canvas-mist text-ink-black antialiased selection:bg-shop-violet selection:text-white">
+        <TopProgressBar />
         <AOSProvider>
           {children}
           <FloatingContact />

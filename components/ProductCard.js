@@ -1,24 +1,34 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import ProductIcon from '@/components/ProductIcon'
 import { formatCurrency } from '@/lib/utils'
 
 export default function ProductCard({ group, index = 0 }) {
+  const [isNavigating, setIsNavigating] = useState(false)
   const isAvailable = group.isAvailable
   const availableCount = group.totalAvailable
   const priceDisplay = group.priceText || (group.minPrice ? formatCurrency(group.minPrice) : 'Liên hệ')
-  const defaultHref = `/shop/${group.defaultProductId}`
-  const delay = Math.min((index % 4) * 75, 300)
+  const defaultProductId = group.defaultProductId || group.id || (group.variants && group.variants[0]?.id)
+  const defaultHref = defaultProductId ? `/shop/${defaultProductId}` : '/shop'
+
+  const handleClick = () => {
+    setIsNavigating(true)
+  }
 
   return (
     <Link
       href={defaultHref}
-      data-aos="fade-up"
-      data-aos-delay={delay}
-      suppressHydrationWarning
-      className="group block bg-pure-white rounded-2xl sm:rounded-cards shadow-sm-2 hover:shadow-lg transition-all duration-300 p-2 sm:p-3 flex flex-col justify-between product-card-hover active:scale-[0.98]"
+      onClick={handleClick}
+      className={`group block bg-pure-white rounded-2xl sm:rounded-cards shadow-sm-2 hover:shadow-lg transition-all duration-300 p-2 sm:p-3 flex flex-col justify-between product-card-hover active:scale-[0.98] cursor-pointer animate-fade-in relative overflow-hidden ${
+        isNavigating ? 'ring-2 ring-shop-violet/40 bg-shop-violet/[0.015]' : ''
+      }`}
     >
+      {/* Top accent loading bar on click */}
+      {isNavigating && (
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-shop-violet shadow-[0_0_8px_rgba(84,51,235,0.8)] animate-pulse z-20" />
+      )}
       {/* 1:1 Image Frame with inner radius */}
       <div
         className="relative w-full aspect-square bg-[#f5f6f7] flex items-center justify-center p-3 sm:p-6 overflow-hidden transition-all duration-300 group-hover:bg-[#f0f2f4] rounded-xl sm:rounded-[20px]"
@@ -89,10 +99,23 @@ export default function ProductCard({ group, index = 0 }) {
             </span>
           </div>
 
-          <span className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-canvas-mist group-hover:bg-shop-violet text-ink-black group-hover:text-white flex items-center justify-center transition-all duration-150 shadow-sm flex-shrink-0">
-            <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
+          <span
+            className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all duration-150 shadow-sm flex-shrink-0 ${
+              isNavigating
+                ? 'bg-shop-violet text-white ring-2 ring-shop-violet/30'
+                : 'bg-canvas-mist group-hover:bg-shop-violet text-ink-black group-hover:text-white'
+            }`}
+          >
+            {isNavigating ? (
+              <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-spin text-white" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+            ) : (
+              <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            )}
           </span>
         </div>
       </div>

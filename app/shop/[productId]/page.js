@@ -372,18 +372,16 @@ export default function ProductDetailPage({ params }) {
                         key={variant.id}
                         type="button"
                         onClick={() => handleSelectVariant(variant)}
-                        className={`p-4 rounded-2xl border text-left flex flex-col justify-between gap-3 transition-all cursor-pointer ${
-                          isSelected
+                        className={`p-4 rounded-2xl border text-left flex flex-col justify-between gap-3 transition-all cursor-pointer ${isSelected
                             ? 'bg-pure-white border-shop-violet shadow-sm ring-1 ring-shop-violet'
                             : 'bg-pure-white border-faint-border hover:border-black/20 shadow-sm'
-                        } ${!varAvailable ? 'bg-red-50/50 border-red-200 hover:border-red-300' : ''}`}
+                          } ${!varAvailable ? 'bg-red-50/50 border-red-200 hover:border-red-300' : ''}`}
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-2">
                             <span
-                              className={`w-4 h-4 rounded-full border flex items-center justify-center flex-shrink-0 ${
-                                isSelected ? 'border-shop-violet bg-shop-violet' : 'border-cool-stone'
-                              }`}
+                              className={`w-4 h-4 rounded-full border flex items-center justify-center flex-shrink-0 ${isSelected ? 'border-shop-violet bg-shop-violet' : 'border-cool-stone'
+                                }`}
                             >
                               {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white"></span>}
                             </span>
@@ -469,11 +467,10 @@ export default function ProductDetailPage({ params }) {
                                   value={emailVal}
                                   onChange={(e) => handleEmailChange(idx, e.target.value)}
                                   placeholder={`email-slot-${idx + 1}@gmail.com`}
-                                  className={`w-full pl-4 pr-9 py-2.5 bg-canvas-mist border rounded-full text-sm text-ink-black placeholder-muted-gray focus:outline-none transition-colors ${
-                                    emailVal && !isValid
+                                  className={`w-full pl-4 pr-9 py-2.5 bg-canvas-mist border rounded-full text-sm text-ink-black placeholder-muted-gray focus:outline-none transition-colors ${emailVal && !isValid
                                       ? 'border-red-300 focus:border-red-400'
                                       : 'border-faint-border focus:border-black/20'
-                                  }`}
+                                    }`}
                                 />
                                 {isValid && (
                                   <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-[#10a37f]">

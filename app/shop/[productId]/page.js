@@ -26,6 +26,7 @@ export default function ProductDetailPage({ params }) {
   const [quantity, setQuantity] = useState(1)
   const [customerEmails, setCustomerEmails] = useState([''])
   const [buying, setBuying] = useState(false)
+  const [createdOrder, setCreatedOrder] = useState(null)
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
   const [user, setUser] = useState(null)
@@ -104,12 +105,13 @@ export default function ProductDetailPage({ params }) {
     setCustomerEmails((prev) => [prev[0] || (user?.email || '')])
     setError('')
     setResult(null)
+    setCreatedOrder(null)
     if (typeof window !== 'undefined') {
       window.history.replaceState(null, '', `/shop/${variant.id}`)
     }
   }
 
-  const handleBuy = () => {
+  const handleBuy = async () => {
     if (!user) {
       router.push(`/auth/login?redirect=/shop/${product.id}`)
       return
@@ -139,7 +141,44 @@ export default function ProductDetailPage({ params }) {
     }
 
     setError('')
-    setShowCheckoutModal(true)
+    setBuying(true)
+
+    try {
+      const emailToSend = customerEmails.filter(Boolean).join(', ') || user?.email || ''
+      const { data: sessionData } = await supabase.auth.getSession()
+      const token = sessionData?.session?.access_token
+
+      const res = await fetch('/api/order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          action: 'transfer',
+          productId: product.id,
+          productName: product.name,
+          quantity,
+          unitPrice,
+          customerEmail: emailToSend,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok || !data.success) {
+        setError(data.error || 'Không thể khởi tạo đơn hàng. Vui lòng thử lại!')
+        return
+      }
+
+      setCreatedOrder(data.order || { client_order_code: data.orderCode, total_price: data.totalPrice })
+      setShowCheckoutModal(true)
+    } catch (err) {
+      console.error('Order creation error:', err)
+      setError('Lỗi kết nối máy chủ khi tạo đơn hàng. Vui lòng thử lại!')
+    } finally {
+      setBuying(false)
+    }
   }
 
   const handleCopy = (text) => {
@@ -579,10 +618,16 @@ export default function ProductDetailPage({ params }) {
                   ) : (
                     <button
                       type="button"
+                      disabled={buying}
                       onClick={handleBuy}
-                      className="shop-pill-btn shop-btn-violet w-full py-3.5 text-sm font-semibold shadow-lg-2"
+                      className="shop-pill-btn shop-btn-violet w-full py-3.5 text-sm font-semibold shadow-lg-2 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      {!user ? (
+                      {buying ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
+                          <span>Đang khởi tạo đơn hàng...</span>
+                        </>
+                      ) : !user ? (
                         '🔐 Đăng nhập để Mua ngay'
                       ) : (
                         '⚡ Thanh toán VietQR ngay'
@@ -656,6 +701,7 @@ export default function ProductDetailPage({ params }) {
       <DirectCheckoutModal
         isOpen={showCheckoutModal}
         onClose={() => setShowCheckoutModal(false)}
+        order={createdOrder}
         product={product}
         quantity={quantity}
         unitPrice={unitPrice}

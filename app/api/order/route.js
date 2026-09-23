@@ -1,16 +1,111 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
 import { sendTelegramNotification, formatNewOrderMessage } from '@/lib/telegram'
 import { isEmailAdmin } from '@/lib/auth/admin'
 import { isExcludedProduct } from '@/lib/utils'
 
+/**
+ * Robust authentication helper checking Bearer token first, then SSR cookies
+ */
+async function getAuthenticatedUser(request, supabase) {
+  // 1. Try Bearer token in Authorization header
+  const authHeader = request.headers.get('Authorization')
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.substring(7).trim()
+    if (token) {
+      try {
+        const serviceClient = createServiceClient()
+        const { data: { user }, error } = await serviceClient.auth.getUser(token)
+        if (!error && user) return user
+      } catch (e) {
+        // Fallback to cookie
+      }
+    }
+  }
+
+  // 2. Try cookie session
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser()
+    if (!error && user) return user
+  } catch (e) {
+    // Ignore
+  }
+
+  return null
+}
+
+/**
+ * Fetch orders endpoint (for both user dashboard and admin)
+ */
+export async function GET(request) {
+  try {
+    const supabase = await createClient()
+    const user = await getAuthenticatedUser(request, supabase)
+    if (!user) {
+      return NextResponse.json({ error: 'Vui lòng đăng nhập để xem đơn hàng' }, { status: 401 })
+    }
+
+    const { searchParams } = new URL(request.url)
+    const isAdminQuery = searchParams.get('admin') === 'true'
+
+    const serviceClient = createServiceClient()
+
+    if (isAdminQuery) {
+      // Check admin authority
+      const { data: profile } = await serviceClient
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      const isAdmin = profile?.role === 'admin' || isEmailAdmin(user.email)
+      if (!isAdmin) {
+        return NextResponse.json({ error: 'Forbidden: Yêu cầu quyền Quản trị viên' }, { status: 403 })
+      }
+
+      const { data: allOrders, error: adminErr } = await serviceClient
+        .from('orders')
+        .select('*, profiles!orders_user_id_fkey(display_name, email)')
+        .order('created_at', { ascending: false })
+
+      if (adminErr) {
+        console.error('Admin fetch orders error:', adminErr)
+        return NextResponse.json({ error: adminErr.message }, { status: 500 })
+      }
+
+      return NextResponse.json({ success: true, orders: allOrders || [] })
+    }
+
+    // Normal user: fetch only their orders
+    const { data: userOrders, error: userErr } = await serviceClient
+      .from('orders')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (userErr) {
+      console.error('User fetch orders error:', userErr)
+      return NextResponse.json({ error: userErr.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true, orders: userOrders || [] })
+  } catch (error) {
+    console.error('GET /api/order error:', error)
+    return NextResponse.json({ error: error.message || 'Lỗi khi tải đơn hàng' }, { status: 500 })
+  }
+}
+
+/**
+ * Create new pending order endpoint
+ */
 export async function POST(request) {
   try {
     const supabase = await createClient()
 
-    // Verify user is authenticated
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    // Verify user is authenticated (Dual-Auth: Header or Cookie)
+    const user = await getAuthenticatedUser(request, supabase)
+    if (!user) {
       return NextResponse.json({ error: 'Vui lòng đăng nhập để tiếp tục' }, { status: 401 })
     }
 
@@ -41,8 +136,9 @@ export async function POST(request) {
     const customerName = user.user_metadata?.full_name || user.user_metadata?.name || ''
     const email = customerEmail || user.email
 
-    // Insert order with 'pending' status for bank transfer (pure insert avoids triggering recursive RLS on profiles)
-    const { error: orderError } = await supabase
+    // Insert order using Service Role client to bypass RLS and guarantee atomic insertion
+    const serviceClient = createServiceClient()
+    const { data: newOrder, error: orderError } = await serviceClient
       .from('orders')
       .insert({
         user_id: user.id,
@@ -55,6 +151,8 @@ export async function POST(request) {
         status: 'pending',
         delivered_text: null,
       })
+      .select()
+      .single()
 
     if (orderError) {
       console.error('Failed to create order in database:', orderError)
@@ -64,7 +162,7 @@ export async function POST(request) {
       )
     }
 
-    // Send Telegram notification
+    // Send Telegram notification immediately to Admin
     try {
       const telegramMessage = formatNewOrderMessage({
         orderCode,
@@ -84,6 +182,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       success: true,
+      order: newOrder,
       orderCode,
       totalPrice,
       status: 'pending',
@@ -104,14 +203,16 @@ export async function POST(request) {
 export async function PATCH(request) {
   try {
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const user = await getAuthenticatedUser(request, supabase)
 
-    if (authError || !user) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const serviceClient = createServiceClient()
+
     // Check admin authority
-    const { data: profile } = await supabase
+    const { data: profile } = await serviceClient
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -137,7 +238,7 @@ export async function PATCH(request) {
       updatePayload.delivered_text = deliveredText
     }
 
-    const { data: updatedOrder, error: updateError } = await supabase
+    const { data: updatedOrder, error: updateError } = await serviceClient
       .from('orders')
       .update(updatePayload)
       .eq('id', orderId)

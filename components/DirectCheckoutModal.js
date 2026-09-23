@@ -9,6 +9,7 @@ export default function DirectCheckoutModal({
   isOpen,
   onClose,
   product,
+  order = null,
   quantity = 1,
   unitPrice = 0,
   user,
@@ -26,21 +27,24 @@ export default function DirectCheckoutModal({
   const bankAccount = process.env.NEXT_PUBLIC_BANK_ACCOUNT || '1030067982'
   const bankName = process.env.NEXT_PUBLIC_BANK_NAME || 'TRAN VAN BE THAN'
 
-  const totalPrice = Number(unitPrice || 0) * Number(quantity || 1)
+  const totalPrice = Number(order?.total_price || (unitPrice || 0) * (quantity || 1))
 
   useEffect(() => {
     if (isOpen) {
-      // Generate unique order code on modal open
-      const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase()
-      const code = `ST-${randomStr}`
-      setOrderCode(code)
+      const code = order?.client_order_code || order?.orderCode
+      if (code) {
+        setOrderCode(code)
+      } else {
+        const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase()
+        setOrderCode(`ST-${randomStr}`)
+      }
       setCustomerEmail(user?.email || '')
       setSuccess(false)
       setError('')
       setSubmitting(false)
-      setCreatedOrder(null)
+      setCreatedOrder(order || null)
     }
-  }, [isOpen, user])
+  }, [isOpen, user, order])
 
   if (!isOpen || !product) return null
 
@@ -58,6 +62,13 @@ export default function DirectCheckoutModal({
   const handleConfirmTransfer = async () => {
     setSubmitting(true)
     setError('')
+
+    // If order was already created in DB beforehand, just mark success screen
+    if (createdOrder) {
+      setSuccess(true)
+      setSubmitting(false)
+      return
+    }
 
     const emailToSend = Array.isArray(customerEmails) && customerEmails.length > 0
       ? customerEmails.filter(Boolean).join(', ')
@@ -83,7 +94,7 @@ export default function DirectCheckoutModal({
       if (!res.ok || !data.success) {
         setError(data.error || 'Đã xảy ra lỗi khi ghi nhận đơn hàng. Vui lòng thử lại!')
       } else {
-        setCreatedOrder(data)
+        setCreatedOrder(data.order || data)
         setSuccess(true)
       }
     } catch (err) {
@@ -174,7 +185,18 @@ export default function DirectCheckoutModal({
             </div>
           ) : (
             /* Checkout Details & QR */
-            <div className="space-y-5">
+            <div className="space-y-4">
+              {/* Order Registered Reassurance Banner */}
+              <div className="p-3 bg-emerald-50/80 border border-emerald-200 rounded-2xl flex items-center justify-between text-xs text-emerald-800 shadow-sm">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                  <span className="font-medium text-[11px]">Đơn hàng đã được lưu trên hệ thống:</span>
+                </div>
+                <span className="font-mono font-bold text-shop-violet bg-pure-white px-2.5 py-0.5 rounded-full border border-emerald-200 text-xs shadow-xs">
+                  {orderCode}
+                </span>
+              </div>
+
               {/* Product Info Bar */}
               <div className="p-3 bg-canvas-mist rounded-2xl flex items-center justify-between border border-faint-border gap-3">
                 <div className="flex items-center gap-3 min-w-0">
@@ -328,17 +350,17 @@ export default function DirectCheckoutModal({
                 type="button"
                 disabled={submitting}
                 onClick={handleConfirmTransfer}
-                className="w-full py-3.5 px-4 bg-shop-violet hover:bg-[#4323d4] text-white text-xs font-semibold rounded-pill shadow-lg-2 hover:shadow-lg transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-3.5 px-4 bg-shop-violet hover:bg-[#4323d4] text-white text-xs font-semibold rounded-pill shadow-lg-2 hover:shadow-lg transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
               >
                 {submitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
-                    <span>Đang gửi thông tin đơn hàng...</span>
+                    <span>Đang cập nhật trạng thái...</span>
                   </>
                 ) : (
                   <>
                     <span>✓</span>
-                    <span>Tôi đã chuyển khoản (Xác nhận thanh toán)</span>
+                    <span>Tôi đã chuyển khoản xong</span>
                   </>
                 )}
               </button>

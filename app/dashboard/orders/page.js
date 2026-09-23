@@ -15,8 +15,33 @@ export default function OrdersPage() {
 
   const loadOrders = async () => {
     try {
+      setLoading(true)
+      setErrorMsg(null)
+
+      const { data: sessionData } = await supabase.auth.getSession()
+      const token = sessionData?.session?.access_token
+
+      const res = await fetch('/api/order', {
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        }
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        if (data.success && Array.isArray(data.orders)) {
+          setOrders(data.orders)
+          setLoading(false)
+          return
+        }
+      }
+
+      // Graceful fallback to client Supabase query if needed
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      if (!user) {
+        setLoading(false)
+        return
+      }
 
       const { data, error } = await supabase
         .from('orders')
@@ -69,12 +94,22 @@ export default function OrdersPage() {
             Tổng cộng {orders.length} đơn hàng đã thực hiện
           </p>
         </div>
-        <Link
-          href="/shop"
-          className="shop-pill-btn shop-btn-violet text-xs py-1.5 px-4"
-        >
-          + Mua đơn mới
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={loadOrders}
+            className="shop-pill-btn shop-btn-white text-xs py-1.5 px-3 flex items-center gap-1 cursor-pointer"
+            title="Làm mới danh sách đơn hàng"
+          >
+            <span>🔄</span> Làm mới
+          </button>
+          <Link
+            href="/shop"
+            className="shop-pill-btn shop-btn-violet text-xs py-1.5 px-4"
+          >
+            + Mua đơn mới
+          </Link>
+        </div>
       </div>
 
       {errorMsg && (

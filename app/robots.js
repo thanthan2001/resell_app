@@ -1,5 +1,5 @@
 export default function robots() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://socialtech.vn'
+  const baseUrl = process.env.SITE_URL || 'https://www.socialtech.id.vn/'
 
   return {
     rules: {

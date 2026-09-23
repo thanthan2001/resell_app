@@ -14,33 +14,63 @@ export default function DashboardPage() {
 
   const loadDashboard = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      setLoading(true)
+      setLoadError(null)
 
-      // Recent orders
-      const { data: orders, error: ordersErr } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+      let orderList = null
 
-      if (ordersErr) {
-        console.error('Fetch orders error:', ordersErr)
-        setLoadError(ordersErr.message)
-      } else {
-        const orderList = orders || []
-        const delivered = orderList.filter((o) => o.status === 'delivered')
-        const pending = orderList.filter((o) => o.status === 'pending')
-        const totalSpent = delivered.reduce((sum, o) => sum + (o.total_price || 0), 0)
+      const { data: sessionData } = await supabase.auth.getSession()
+      const token = sessionData?.session?.access_token
 
-        setRecentOrders(orderList.slice(0, 8))
-        setStats({
-          totalOrders: orderList.length,
-          deliveredOrders: delivered.length,
-          pendingOrders: pending.length,
-          totalSpent,
+      try {
+        const res = await fetch('/api/order', {
+          headers: {
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+          }
         })
+        if (res.ok) {
+          const data = await res.json()
+          if (data.success && Array.isArray(data.orders)) {
+            orderList = data.orders
+          }
+        }
+      } catch (apiErr) {
+        // Fallback below
       }
+
+      if (orderList === null) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+          setLoading(false)
+          return
+        }
+
+        const { data: orders, error: ordersErr } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+
+        if (ordersErr) {
+          console.error('Fetch orders error:', ordersErr)
+          setLoadError(ordersErr.message)
+          orderList = []
+        } else {
+          orderList = orders || []
+        }
+      }
+
+      const delivered = orderList.filter((o) => o.status === 'delivered')
+      const pending = orderList.filter((o) => o.status === 'pending')
+      const totalSpent = delivered.reduce((sum, o) => sum + (o.total_price || 0), 0)
+
+      setRecentOrders(orderList.slice(0, 8))
+      setStats({
+        totalOrders: orderList.length,
+        deliveredOrders: delivered.length,
+        pendingOrders: pending.length,
+        totalSpent,
+      })
     } catch (err) {
       console.error('Dashboard load catch:', err)
       setLoadError(err.message)

@@ -49,12 +49,12 @@ export default function Header() {
         }`}
     >
       <div className="shop-container h-16 flex items-center justify-between gap-4">
-        {/* Logo with Refero Violet Dot */}
+        {/* Logo with Restrained Warm Accent Dot */}
         <Link href="/" className="flex items-center gap-1.5 group select-none">
           <span className="text-xl font-medium tracking-shop-display text-ink-black">
             socialTech
           </span>
-          <span className="w-2 h-2 rounded-full bg-shop-violet -ml-0.5"></span>
+          <span className="w-2 h-2 rounded-full bg-warm-accent -ml-0.5"></span>
         </Link>
 
         {/* Center Pill Navigation */}
@@ -92,19 +92,9 @@ export default function Header() {
             href="https://zalo.me/0788836968"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3 py-1.5 rounded-full text-muted-gray hover:text-[#0068FF] transition-colors inline-flex items-center gap-1.5 tracking-shop-body text-xs"
+            className="px-3.5 py-1.5 rounded-full text-muted-gray hover:text-ink-black transition-colors inline-flex items-center gap-1.5 tracking-shop-body text-xs font-normal"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#0068FF]"></span>
-            <span>Zalo</span>
-          </a>
-          <a
-            href="https://www.facebook.com/thanthan1011"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-3 py-1.5 rounded-full text-muted-gray hover:text-[#1877F2] transition-colors inline-flex items-center gap-1.5 tracking-shop-body text-xs"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#1877F2]"></span>
-            <span>Facebook ↗</span>
+            <span>Hỗ trợ 24/7</span>
           </a>
         </nav>
 
@@ -265,25 +255,25 @@ export default function Header() {
               href="https://zalo.me/0788836968"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between px-4 py-2.5 rounded-full bg-[#0068FF]/5 hover:bg-[#0068FF]/10 text-[#0068FF] font-medium transition-colors"
+              className="flex items-center justify-between px-4 py-2.5 rounded-full bg-canvas-mist hover:bg-faint-border text-ink-black font-medium transition-colors"
             >
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#0068FF]"></span>
-                <span>Zalo: 0788836968</span>
+              <div className="flex items-center gap-2 text-xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-warm-accent"></span>
+                <span>Zalo hỗ trợ (0788836968)</span>
               </div>
-              <span className="text-xs font-semibold">Nhắn tin ↗</span>
+              <span className="text-xs text-muted-gray">24/7 ↗</span>
             </a>
             <a
               href="https://www.facebook.com/thanthan1011"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between px-4 py-2.5 rounded-full bg-[#1877F2]/5 hover:bg-[#1877F2]/10 text-[#1877F2] font-medium transition-colors"
+              className="flex items-center justify-between px-4 py-2.5 rounded-full bg-canvas-mist hover:bg-faint-border text-ink-black font-medium transition-colors"
             >
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#1877F2]"></span>
+              <div className="flex items-center gap-2 text-xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-muted-gray"></span>
                 <span>Facebook cá nhân</span>
               </div>
-              <span className="text-xs font-semibold">Ghé thăm ↗</span>
+              <span className="text-xs text-muted-gray">Ghé thăm ↗</span>
             </a>
           </div>
         </div>

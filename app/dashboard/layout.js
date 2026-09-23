@@ -71,7 +71,7 @@ export default function DashboardLayout({ children }) {
               <span className="text-xl font-medium tracking-shop-display text-ink-black">
                 socialTech
               </span>
-              <span className="w-2.5 h-2.5 rounded-full bg-shop-violet -ml-0.5"></span>
+              <span className="w-2.5 h-2.5 rounded-full bg-warm-accent -ml-0.5"></span>
             </Link>
 
             {/* Mobile close button */}

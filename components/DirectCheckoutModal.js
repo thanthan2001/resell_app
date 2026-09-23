@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import ProductIcon from '@/components/ProductIcon'
 import { formatCurrency, generateVietQRUrl } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/client'
 
 export default function DirectCheckoutModal({
   isOpen,
@@ -30,11 +31,15 @@ export default function DirectCheckoutModal({
   const totalPrice = Number(order?.total_price || (unitPrice || 0) * (quantity || 1))
 
   useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose?.()
+    }
     if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown)
       const code = order?.client_order_code || order?.orderCode
       if (code) {
         setOrderCode(code)
-      } else {
+      } else if (!orderCode) {
         const randomStr = Math.random().toString(36).substring(2, 7).toUpperCase()
         setOrderCode(`ST-${randomStr}`)
       }
@@ -43,8 +48,15 @@ export default function DirectCheckoutModal({
       setError('')
       setSubmitting(false)
       setCreatedOrder(order || null)
+    } else {
+      setOrderCode('')
+      setSuccess(false)
+      setError('')
+      setSubmitting(false)
+      setCreatedOrder(null)
     }
-  }, [isOpen, user, order])
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, user, order, onClose])
 
   if (!isOpen || !product) return null
 
@@ -60,6 +72,7 @@ export default function DirectCheckoutModal({
   }
 
   const handleConfirmTransfer = async () => {
+    if (submitting) return
     setSubmitting(true)
     setError('')
 
@@ -70,14 +83,27 @@ export default function DirectCheckoutModal({
       return
     }
 
-    const emailToSend = Array.isArray(customerEmails) && customerEmails.length > 0
+    const emailToSend = Array.isArray(customerEmails) && customerEmails.length > 0 && customerEmails.some(Boolean)
       ? customerEmails.filter(Boolean).join(', ')
       : (customerEmail || user?.email || '')
 
+    if (!emailToSend) {
+      setError('Vui lòng nhập email nhận tài khoản hoặc thông tin đơn hàng.')
+      setSubmitting(false)
+      return
+    }
+
     try {
+      const supabase = createClient()
+      const { data: sessionData } = await supabase.auth.getSession()
+      const token = sessionData?.session?.access_token
+
       const res = await fetch('/api/order', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           action: 'transfer',
           productId: product.id,
@@ -105,28 +131,36 @@ export default function DirectCheckoutModal({
     }
   }
 
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-black/40 backdrop-blur-sm animate-fade-in font-sans">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="checkout-modal-title"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-black/40 backdrop-blur-sm animate-fade-in font-sans"
+    >
       <div
         className="relative w-full max-w-lg bg-pure-white rounded-cards shadow-2xl border border-faint-border overflow-hidden transition-all animate-pop-in"
-        style={{ borderRadius: '28px' }}
       >
         {/* Header */}
         <div className="p-6 border-b border-faint-border flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-shop-violet/10 text-shop-violet flex items-center justify-center font-bold text-sm">
+            <div className="w-8 h-8 rounded-full bg-accent-wash text-warm-accent flex items-center justify-center font-bold text-sm">
               💳
             </div>
             <div>
-              <h3 className="font-semibold text-ink-black tracking-shop-display text-base">
+              <h3 id="checkout-modal-title" className="font-semibold text-ink-black tracking-shop-display text-base">
                 {success ? 'Xác Nhận Đơn Hàng' : 'Thanh Toán Chuyển Khoản'}
               </h3>
               <p className="text-xs text-muted-gray">Quét VietQR & Nhập chính xác nội dung</p>
             </div>
           </div>
           <button
+            type="button"
+            aria-label="Đóng cửa sổ"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-canvas-mist hover:bg-faint-border text-muted-gray hover:text-ink-black flex items-center justify-center transition-colors text-sm"
+            className="w-8 h-8 rounded-full bg-canvas-mist hover:bg-faint-border text-muted-gray hover:text-ink-black flex items-center justify-center transition-colors text-sm cursor-pointer"
           >
             ✕
           </button>
@@ -158,7 +192,7 @@ export default function DirectCheckoutModal({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-gray">Tổng tiền:</span>
-                  <span className="font-bold text-shop-violet">{formatCurrency(totalPrice)}</span>
+                  <span className="font-bold text-warm-accent">{formatCurrency(totalPrice)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-gray">Trạng thái:</span>
@@ -171,13 +205,14 @@ export default function DirectCheckoutModal({
               <div className="flex flex-col sm:flex-row gap-2 pt-2">
                 <Link
                   href="/dashboard/orders"
-                  className="flex-1 py-3 px-4 rounded-pill bg-shop-violet hover:bg-[#4323d4] text-white text-xs font-semibold text-center transition-all shadow-lg-2"
+                  className="flex-1 py-3 px-4 rounded-full bg-warm-accent hover:opacity-90 text-white text-xs font-semibold text-center transition-all shadow-lg-2"
                 >
                   Xem Đơn Hàng Của Tôi
                 </Link>
                 <button
+                  type="button"
                   onClick={onClose}
-                  className="py-3 px-4 rounded-pill border border-faint-border hover:bg-canvas-mist text-ink-black text-xs font-medium transition-colors"
+                  className="py-3 px-4 rounded-full border border-faint-border hover:bg-canvas-mist text-ink-black text-xs font-medium transition-colors"
                 >
                   Tiếp tục xem sản phẩm
                 </button>
@@ -186,13 +221,13 @@ export default function DirectCheckoutModal({
           ) : (
             /* Checkout Details & QR */
             <div className="space-y-4">
-              {/* Order Registered Reassurance Banner */}
-              <div className="p-3 bg-emerald-50/80 border border-emerald-200 rounded-2xl flex items-center justify-between text-xs text-emerald-800 shadow-sm">
+              {/* Order Reference Banner */}
+              <div className="p-3 bg-canvas-mist border border-faint-border rounded-2xl flex items-center justify-between text-xs text-ink-black shadow-xs">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
-                  <span className="font-medium text-[11px]">Đơn hàng đã được lưu trên hệ thống:</span>
+                  <span className="w-2 h-2 rounded-full bg-warm-accent animate-pulse shrink-0"></span>
+                  <span className="font-medium text-[11px] text-muted-gray">Mã đơn chuyển khoản:</span>
                 </div>
-                <span className="font-mono font-bold text-shop-violet bg-pure-white px-2.5 py-0.5 rounded-full border border-emerald-200 text-xs shadow-xs">
+                <span className="font-mono font-bold text-warm-accent bg-pure-white px-2.5 py-0.5 rounded-full border border-faint-border text-xs shadow-xs">
                   {orderCode}
                 </span>
               </div>
@@ -214,7 +249,7 @@ export default function DirectCheckoutModal({
                   </div>
                 </div>
                 <div className="text-right whitespace-nowrap shrink-0">
-                  <div className="text-sm font-bold text-shop-violet">{formatCurrency(totalPrice)}</div>
+                  <div className="text-sm font-bold text-warm-accent">{formatCurrency(totalPrice)}</div>
                 </div>
               </div>
 
@@ -230,7 +265,7 @@ export default function DirectCheckoutModal({
                         key={idx}
                         className="flex items-center gap-2 text-[11px] bg-pure-white px-3 py-1.5 rounded-lg border border-faint-border text-ink-black"
                       >
-                        <span className="text-shop-violet font-semibold text-[10px] uppercase shrink-0">
+                        <span className="text-warm-accent font-semibold text-[10px] uppercase shrink-0">
                           Slot {idx + 1}:
                         </span>
                         <span className="truncate font-mono">{em || '(Chưa nhập)'}</span>
@@ -266,7 +301,7 @@ export default function DirectCheckoutModal({
                   <button
                     type="button"
                     onClick={() => handleCopy(bankAccount, 'account')}
-                    className="px-3 py-1.5 bg-pure-white hover:bg-faint-border border border-faint-border rounded-pill text-[11px] font-medium text-ink-black transition-colors"
+                    className="px-3 py-1.5 bg-pure-white hover:bg-faint-border border border-faint-border rounded-full text-[11px] font-medium text-ink-black transition-colors cursor-pointer"
                   >
                     {copiedField === 'account' ? '✓ Đã copy' : 'Sao chép'}
                   </button>
@@ -281,7 +316,7 @@ export default function DirectCheckoutModal({
                   <button
                     type="button"
                     onClick={() => handleCopy(bankName, 'name')}
-                    className="px-3 py-1.5 bg-pure-white hover:bg-faint-border border border-faint-border rounded-pill text-[11px] font-medium text-ink-black transition-colors"
+                    className="px-3 py-1.5 bg-pure-white hover:bg-faint-border border border-faint-border rounded-full text-[11px] font-medium text-ink-black transition-colors cursor-pointer"
                   >
                     {copiedField === 'name' ? '✓ Đã copy' : 'Sao chép'}
                   </button>
@@ -291,29 +326,29 @@ export default function DirectCheckoutModal({
                 <div className="flex items-center justify-between p-3 bg-canvas-mist rounded-xl border border-faint-border">
                   <div>
                     <div className="text-[10px] text-muted-gray uppercase tracking-wider">Số tiền thanh toán</div>
-                    <div className="font-bold text-shop-violet text-sm">{formatCurrency(totalPrice)}</div>
+                    <div className="font-bold text-warm-accent text-sm">{formatCurrency(totalPrice)}</div>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleCopy(totalPrice, 'amount')}
-                    className="px-3 py-1.5 bg-pure-white hover:bg-faint-border border border-faint-border rounded-pill text-[11px] font-medium text-ink-black transition-colors"
+                    className="px-3 py-1.5 bg-pure-white hover:bg-faint-border border border-faint-border rounded-full text-[11px] font-medium text-ink-black transition-colors cursor-pointer"
                   >
                     {copiedField === 'amount' ? '✓ Đã copy' : 'Sao chép'}
                   </button>
                 </div>
 
                 {/* Transfer Content / Order Code */}
-                <div className="flex items-center justify-between p-3 bg-shop-violet/5 border-2 border-shop-violet/30 rounded-xl">
+                <div className="flex items-center justify-between p-3 bg-accent-wash border-2 border-warm-accent/30 rounded-xl">
                   <div>
-                    <div className="text-[10px] text-shop-violet font-semibold uppercase tracking-wider">
+                    <div className="text-[10px] text-warm-accent font-semibold uppercase tracking-wider">
                       Nội dung chuyển khoản (Bắt buộc)
                     </div>
-                    <div className="font-mono font-extrabold text-base text-shop-violet">{orderCode}</div>
+                    <div className="font-mono font-extrabold text-base text-warm-accent">{orderCode}</div>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleCopy(orderCode, 'code')}
-                    className="px-3 py-1.5 bg-shop-violet hover:bg-[#4323d4] text-white rounded-pill text-[11px] font-medium transition-colors shadow-sm"
+                    className="px-3 py-1.5 bg-warm-accent hover:opacity-90 text-white rounded-full text-[11px] font-medium transition-colors shadow-sm cursor-pointer"
                   >
                     {copiedField === 'code' ? '✓ Đã copy' : 'Sao chép'}
                   </button>
@@ -322,22 +357,25 @@ export default function DirectCheckoutModal({
 
               {/* Warning box */}
               <div className="p-3 bg-amber-50 border border-amber-200/80 rounded-xl text-[11px] text-amber-800 leading-relaxed">
-                ⚠️ <b>Lưu ý quan trọng:</b> Hãy chuyển đúng <b>{formatCurrency(totalPrice)}</b> và ghi chính xác nội dung <b>{orderCode}</b> để Admin duyệt đơn nhanh nhất!
+                ⚠️ <b>Lưu ý quan trọng:</b> Hãy chuyển đúng <b>{formatCurrency(totalPrice)}</b> và ghi chính xác nội dung <b>{orderCode}</b>. Sau khi chuyển xong, bấm nút <b>"✓ Tôi đã chuyển khoản xong"</b> bên dưới để hệ thống lập tức ghi nhận đơn và gửi thông báo kích hoạt đến Admin!
               </div>
 
               {/* Customer Email confirmation */}
-              <div>
-                <label className="block text-[11px] font-medium text-muted-gray mb-1">
-                  Email nhận tài khoản / thông tin đơn hàng
-                </label>
-                <input
-                  type="email"
-                  value={customerEmail}
-                  onChange={(e) => setCustomerEmail(e.target.value)}
-                  placeholder="Nhập email của bạn"
-                  className="w-full px-3.5 py-2.5 bg-canvas-mist border border-faint-border rounded-xl text-xs focus:outline-none focus:border-shop-violet text-ink-black"
-                />
-              </div>
+              {(!customerEmails || customerEmails.length === 0 || !customerEmails.some(Boolean)) && (
+                <div>
+                  <label className="block text-[11px] font-medium text-muted-gray mb-1">
+                    Email nhận tài khoản / thông tin đơn hàng <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={customerEmail}
+                    onChange={(e) => setCustomerEmail(e.target.value)}
+                    placeholder="Nhập email của bạn"
+                    required
+                    className="w-full px-3.5 py-2.5 bg-canvas-mist border border-faint-border rounded-xl text-xs focus:outline-none focus:border-warm-accent text-ink-black"
+                  />
+                </div>
+              )}
 
               {error && (
                 <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl">
@@ -350,12 +388,12 @@ export default function DirectCheckoutModal({
                 type="button"
                 disabled={submitting}
                 onClick={handleConfirmTransfer}
-                className="w-full py-3.5 px-4 bg-shop-violet hover:bg-[#4323d4] text-white text-xs font-semibold rounded-pill shadow-lg-2 hover:shadow-lg transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3.5 px-4 bg-warm-accent hover:opacity-90 text-white text-xs font-semibold rounded-full shadow-lg-2 hover:shadow-lg transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
               >
                 {submitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
-                    <span>Đang cập nhật trạng thái...</span>
+                    <span>Đang gửi xác nhận đơn hàng tới Admin...</span>
                   </>
                 ) : (
                   <>

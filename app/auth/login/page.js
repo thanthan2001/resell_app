@@ -56,7 +56,7 @@ function LoginForm() {
             <span className="text-2xl font-medium tracking-shop-display text-ink-black">
               socialTech
             </span>
-            <span className="w-2.5 h-2.5 rounded-full bg-shop-violet -ml-0.5"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-warm-accent -ml-0.5"></span>
           </Link>
           <p className="text-xs text-muted-gray mt-2 tracking-shop-body">
             Hệ thống cung cấp bản quyền số tự động
@@ -120,7 +120,7 @@ function LoginForm() {
             <button
               type="submit"
               disabled={loading}
-              className="shop-pill-btn shop-btn-violet w-full py-3 text-xs font-semibold mt-2 cursor-pointer"
+              className="shop-pill-btn shop-btn-accent w-full py-3 text-xs font-semibold mt-2 cursor-pointer"
             >
               {loading ? 'Đang xử lý...' : mode === 'login' ? 'Đăng nhập' : 'Đăng ký tài khoản'}
             </button>
@@ -134,7 +134,7 @@ function LoginForm() {
                 <button
                   type="button"
                   onClick={() => { setMode('register'); setError('') }}
-                  className="font-semibold text-shop-violet hover:underline cursor-pointer"
+                  className="font-semibold text-warm-accent hover:underline cursor-pointer"
                 >
                   Đăng ký ngay
                 </button>
@@ -145,7 +145,7 @@ function LoginForm() {
                 <button
                   type="button"
                   onClick={() => { setMode('login'); setError('') }}
-                  className="font-semibold text-shop-violet hover:underline cursor-pointer"
+                  className="font-semibold text-warm-accent hover:underline cursor-pointer"
                 >
                   Đăng nhập
                 </button>

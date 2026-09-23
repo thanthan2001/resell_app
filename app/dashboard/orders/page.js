@@ -223,7 +223,7 @@ CREATE POLICY "Service can update orders" ON public.orders FOR UPDATE USING (tru
                 </div>
                 <div>
                   <span className="text-[11px] text-muted-gray block">Tổng thanh toán:</span>
-                  <span className="font-bold text-shop-violet text-sm">{formatCurrency(order.total_price)}</span>
+                  <span className="font-bold text-warm-accent text-sm">{formatCurrency(order.total_price)}</span>
                 </div>
                 <div>
                   <span className="text-[11px] text-muted-gray block">Thời gian đặt:</span>
@@ -237,7 +237,7 @@ CREATE POLICY "Service can update orders" ON public.orders FOR UPDATE USING (tru
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                     <span>
-                      Đơn hàng đang chờ Admin kiểm tra giao dịch và cấp tài khoản. Nội dung CK: <strong className="font-mono font-bold text-shop-violet">{order.client_order_code || '—'}</strong>
+                      Đơn hàng đang chờ Admin kiểm tra giao dịch và cấp tài khoản. Nội dung CK: <strong className="font-mono font-bold text-warm-accent">{order.client_order_code || '—'}</strong>
                     </span>
                   </div>
                 </div>

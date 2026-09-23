@@ -29,7 +29,7 @@ export const metadata = {
     locale: 'vi_VN',
     url: 'https://socialtech.vn',
     siteName: 'socialTech Shop',
-    title: 'socialTech — Tài Khoản & Key Bản Quyền AI Uy Tín Số 1',
+    title: 'socialTech — Tài Khoản & Key Bản Quyền AI',
     description: 'Cửa hàng tài khoản và phần mềm bản quyền tự động. Thanh toán VietQR tức thì trong 5 giây.',
   },
   robots: {
@@ -61,7 +61,7 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-screen bg-canvas-mist text-ink-black antialiased selection:bg-shop-violet selection:text-white">
+      <body className="min-h-screen bg-canvas-mist text-ink-black antialiased selection:bg-warm-accent selection:text-white">
         <TopProgressBar />
         <AOSProvider>
           {children}

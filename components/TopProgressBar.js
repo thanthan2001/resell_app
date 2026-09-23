@@ -88,7 +88,7 @@ function TopProgressBarContent() {
       className="fixed top-0 left-0 right-0 z-[99999] pointer-events-none h-[3px] bg-transparent"
     >
       <div
-        className="h-full bg-shop-violet shadow-[0_0_12px_rgba(84,51,235,0.8)]"
+        className="h-full bg-warm-accent shadow-[0_0_12px_rgba(234,88,12,0.8)]"
         style={{
           width: `${progress}%`,
           opacity: progress === 100 ? 0 : 1,

@@ -1,34 +1,38 @@
-# socialTech — Refero Shop Design System for Antigravity
+# TUANTHOI — Dialog Refero Design System for Antigravity
+
+This package replaces the previous Shop-style setup with the uploaded Dialog-style source.
 
 ## Install
-Copy the `.agents` folder into the root of the Antigravity workspace.
 
-Copy the `design-system` folder (or its contents) into:
-`.agents/skills/shop-design-system/`
+Copy `.agents/` into the root of the Antigravity workspace.
 
-Recommended final structure:
+Final structure:
 
 .agents/
 ├── rules/
-│   └── shop-ui-rule.md
+│   └── dialog-ui-rule.md
 └── skills/
-    └── shop-design-system/
+    └── dialog-design-system/
         ├── SKILL.md
         └── references/
             ├── 01-foundation.md
             ├── 02-components.md
             ├── 03-guidelines.md
             ├── 04-layout-imagery.md
-            └── 05-tokens-css.md
+            ├── 05-tokens-css.md
             └── refero-source.md
 
-## Why this structure
-The Always On rule is deliberately compact. The complete Refero DESIGN.md is not placed inside the rule, avoiding the 12,000-character Rule limit.
+Also use `MASTER-PROMPT.md` as the initial Antigravity prompt.
 
-The original Refero source is preserved unchanged as `refero-source.md`.
-The other five files are organized copies of the source's original line ranges.
+## Source integrity
 
-The skill uses progressive disclosure: the agent reads only the reference needed for the current UI task.
+`refero-source.md` is an exact copy of the uploaded DESIGN.md.
+The categorized references are copies of exact source line ranges.
+
+The Always On rule is intentionally compact so it stays below the Rule limit.
+The full source lives in the Skill references instead of inside the Rule.
 
 ## Important
-Do not delete `refero-source.md`. It is the canonical fallback when a detail is ambiguous.
+
+The visual system is adapted to TUANTHOI e-commerce. Do not clone the source
+site's branding, content, or unrelated business-specific structure.

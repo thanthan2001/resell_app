@@ -85,7 +85,7 @@ export default function ProductDetailLoading() {
 
                 {/* Action Button Skeleton */}
                 <div className="pt-4">
-                  <div className="w-full h-14 rounded-full bg-shop-violet/25 shadow-sm"></div>
+                  <div className="w-full h-14 rounded-full bg-warm-accent/20 shadow-sm"></div>
                 </div>
               </div>
             </div>

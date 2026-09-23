@@ -17,9 +17,11 @@
   --color-faint-border: #ebebeb;
   --color-muted-gray: #787574;
   --color-cool-stone: #cccccc;
-  --color-warm-fog: #acb0aa;
-  --color-shop-violet: #5433eb;
-  --color-violet-wash: #c0b5f3;
+  /* Restrained Warm Accent (Warm Burnt Amber / Terracotta) */
+  --color-warm-accent: #ea580c;
+  --color-accent-wash: rgba(234, 88, 12, 0.12);
+  --color-shop-violet: var(--color-warm-accent); /* Backward compatibility alias */
+  --color-violet-wash: var(--color-accent-wash); /* Backward compatibility alias */
   --color-slate-ink: #332f2d;
   --color-ash-veil: #665a54;
 
@@ -80,7 +82,8 @@
   --shadow-sm: rgba(0, 0, 0, 0.06) 0px 2px 8px 0px;
   --shadow-sm-2: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px;
   --shadow-lg: rgba(0, 0, 0, 0.12) 0px 4px 24px 0px;
-  --shadow-lg-2: rgba(69, 36, 219, 0.34) 0px 4px 24px 0px;
+  --shadow-lg-2: rgba(234, 88, 12, 0.28) 0px 4px 24px 0px;
+  --shadow-accent: rgba(234, 88, 12, 0.28) 0px 4px 24px 0px;
 
   /* Surfaces */
   --surface-canvas: #f2f4f5;
@@ -105,8 +108,8 @@
   --color-border-subtle: #f0f0f0;
   --color-text-primary: #000000;
   --color-text-secondary: #787574;
-  --color-text-muted: #949698;
-  --color-accent: #5433eb;
+  --color-text-muted: #787574;
+  --color-accent: var(--color-warm-accent);
   --color-success: #10a37f;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
@@ -233,14 +236,16 @@ input:focus, select:focus, textarea:focus {
   border: 1px solid transparent;
 }
 
-/* Violet Submit & Action Pill */
-.shop-btn-violet {
-  background-color: var(--color-shop-violet);
+/* Warm Accent / Violet Action Pill */
+.shop-btn-violet,
+.shop-btn-accent {
+  background-color: var(--color-warm-accent);
   color: #ffffff;
-  box-shadow: var(--shadow-lg-2);
+  box-shadow: var(--shadow-accent);
 }
-.shop-btn-violet:hover {
-  background-color: #4524db;
+.shop-btn-violet:hover,
+.shop-btn-accent:hover {
+  background-color: #c2410c;
   transform: scale(1.02);
 }
 
@@ -311,19 +316,19 @@ input:focus, select:focus, textarea:focus {
   width: 44px;
   height: 44px;
   border-radius: 9999px;
-  background-color: var(--color-shop-violet);
+  background-color: var(--color-warm-accent);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   cursor: pointer;
-  box-shadow: var(--shadow-lg-2);
+  box-shadow: var(--shadow-accent);
   transition: transform 0.15s ease, background-color 0.15s ease;
   flex-shrink: 0;
 }
 .shop-search-submit:hover {
-  background-color: #4524db;
+  background-color: #c2410c;
   transform: scale(1.05);
 }
 
@@ -454,8 +459,13 @@ html {
 }
 
 ::selection {
-  background-color: var(--color-violet-wash);
-  color: var(--color-shop-violet);
+  background-color: var(--color-accent-wash);
+  color: var(--color-warm-accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-warm-accent);
+  outline-offset: 2px;
 }
 
 /* 2. Tactile Button Click Spring (Active Feedback) */
@@ -469,16 +479,18 @@ a.shop-pill-btn:active,
   transition: transform 0.08s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
 }
 
-/* 3. Violet Button Glow & Lift */
-.shop-btn-violet {
+/* 3. Warm Accent Button Glow & Lift */
+.shop-btn-violet,
+.shop-btn-accent {
   transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
               box-shadow 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
               background-color 0.2s ease !important;
 }
-.shop-btn-violet:hover {
-  background-color: #4524db !important;
+.shop-btn-violet:hover,
+.shop-btn-accent:hover {
+  background-color: #c2410c !important;
   transform: translateY(-1.5px) !important;
-  box-shadow: 0 6px 24px rgba(84, 51, 235, 0.45) !important;
+  box-shadow: 0 6px 24px rgba(234, 88, 12, 0.38) !important;
 }
 
 /* 4. White & Black Pill Hover Transitions */

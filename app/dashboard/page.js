@@ -125,7 +125,7 @@ export default function DashboardPage() {
             <span className="text-[11px] text-muted-gray">Thanh toán VietQR trực tiếp</span>
             <Link
               href="/dashboard/orders"
-              className="text-xs font-semibold text-shop-violet hover:underline"
+              className="text-xs font-semibold text-warm-accent hover:underline"
             >
               Xem chi tiết →
             </Link>
@@ -146,7 +146,7 @@ export default function DashboardPage() {
             <span className="text-[11px] text-muted-gray">Admin đang kiểm tra</span>
             <Link
               href="/dashboard/orders"
-              className="text-xs font-semibold text-shop-violet hover:underline"
+              className="text-xs font-semibold text-warm-accent hover:underline"
             >
               Theo dõi →
             </Link>
@@ -159,7 +159,7 @@ export default function DashboardPage() {
             <div className="text-xs text-muted-gray uppercase font-semibold tracking-wider mb-1">
               💸 Tổng chi tiêu
             </div>
-            <div className="text-3xl font-bold text-shop-violet tracking-tight mt-1">
+            <div className="text-3xl font-bold text-warm-accent tracking-tight mt-1">
               {formatCurrency(stats.totalSpent)}
             </div>
           </div>
@@ -167,7 +167,7 @@ export default function DashboardPage() {
             <span className="text-[11px] text-muted-gray">Giá bản quyền tốt nhất</span>
             <Link
               href="/shop"
-              className="text-xs font-semibold text-shop-violet hover:underline"
+              className="text-xs font-semibold text-warm-accent hover:underline"
             >
               Mua sắm ngay →
             </Link>
@@ -186,7 +186,7 @@ export default function DashboardPage() {
           </div>
           <Link
             href="/dashboard/orders"
-            className="text-xs font-semibold text-shop-violet hover:underline"
+            className="text-xs font-semibold text-warm-accent hover:underline"
           >
             Xem tất cả →
           </Link>
@@ -198,7 +198,7 @@ export default function DashboardPage() {
             <p className="text-xs text-muted-gray mb-4">Bạn chưa thực hiện đơn hàng nào.</p>
             <Link
               href="/shop"
-              className="shop-pill-btn shop-btn-violet text-xs"
+              className="shop-pill-btn shop-btn-accent text-xs"
             >
               Khám phá cửa hàng ngay →
             </Link>
@@ -219,7 +219,7 @@ export default function DashboardPage() {
               <tbody className="divide-y divide-faint-border">
                 {recentOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-canvas-mist/40 transition-colors">
-                    <td className="py-3 font-mono font-bold text-shop-violet">
+                    <td className="py-3 font-mono font-bold text-warm-accent">
                       {order.client_order_code || order.id.slice(0, 8)}
                     </td>
                     <td className="py-3 font-medium text-ink-black max-w-xs truncate">

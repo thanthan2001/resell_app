@@ -13,7 +13,7 @@ export default function Footer() {
               <span className="text-lg font-semibold tracking-shop-display text-ink-black">
                 socialTech
               </span>
-              <span className="w-2 h-2 rounded-full bg-shop-violet -ml-0.5"></span>
+              <span className="w-2 h-2 rounded-full bg-warm-accent -ml-0.5"></span>
             </Link>
             <p className="text-muted-gray leading-relaxed text-xs max-w-xs">
               Hệ thống cung cấp bản quyền số và tài khoản công nghệ AI chính hãng. Kích hoạt tự động, thanh toán VietQR 24/7.

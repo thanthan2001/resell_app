@@ -163,6 +163,7 @@ export async function POST(request) {
     }
 
     // Send Telegram notification immediately to Admin
+    let teleResult = null
     try {
       const telegramMessage = formatNewOrderMessage({
         orderCode,
@@ -175,7 +176,12 @@ export async function POST(request) {
         bankAccount: process.env.NEXT_PUBLIC_BANK_ACCOUNT,
         bankId: process.env.NEXT_PUBLIC_BANK_ID,
       })
-      await sendTelegramNotification(telegramMessage)
+      teleResult = await sendTelegramNotification(telegramMessage)
+      if (!teleResult?.success) {
+        console.error('[POST /api/order] Telegram dispatch failed:', teleResult)
+      } else {
+        console.log('[POST /api/order] Telegram notification dispatched successfully for order:', orderCode)
+      }
     } catch (telegramErr) {
       console.error('Telegram dispatch error (non-fatal):', telegramErr)
     }
@@ -185,6 +191,7 @@ export async function POST(request) {
       order: newOrder,
       orderCode,
       totalPrice,
+      telegramSent: teleResult?.success ?? false,
       status: 'pending',
       message: 'Đơn hàng đã được tạo thành công và đang chờ xác nhận thanh toán',
     })

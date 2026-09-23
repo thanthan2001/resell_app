@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect, use, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
@@ -33,6 +33,8 @@ export default function ProductDetailPage({ params }) {
   const [wallet, setWallet] = useState(null)
   const [copied, setCopied] = useState(false)
   const [showCheckoutModal, setShowCheckoutModal] = useState(false)
+  const [showStickyBar, setShowStickyBar] = useState(false)
+  const buyBarRef = useRef(null)
   const router = useRouter()
   const supabase = createClient()
 
@@ -74,6 +76,19 @@ export default function ProductDetailPage({ params }) {
     fetchData()
     checkAuth()
   }, [productId])
+
+  // Track visibility of main buy box to show mobile sticky bottom bar
+  useEffect(() => {
+    if (!buyBarRef.current) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowStickyBar(!entry.isIntersecting)
+      },
+      { threshold: 0.1 }
+    )
+    observer.observe(buyBarRef.current)
+    return () => observer.disconnect()
+  }, [product, loading])
 
   const handleQuantityChange = (newQty) => {
     const qty = Math.max(1, newQty)
@@ -141,45 +156,10 @@ export default function ProductDetailPage({ params }) {
     }
 
     setError('')
-    setBuying(true)
-
-    try {
-      const emailToSend = customerEmails.filter(Boolean).join(', ') || user?.email || ''
-      const { data: sessionData } = await supabase.auth.getSession()
-      const token = sessionData?.session?.access_token
-
-      const res = await fetch('/api/order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
-          action: 'transfer',
-          productId: product.id,
-          productName: product.name,
-          quantity,
-          unitPrice,
-          customerEmail: emailToSend,
-        }),
-      })
-
-      const data = await res.json()
-
-      if (!res.ok || !data.success) {
-        setError(data.error || 'Không thể khởi tạo đơn hàng. Vui lòng thử lại!')
-        return
-      }
-
-      setCreatedOrder(data.order || { client_order_code: data.orderCode, total_price: data.totalPrice })
-      setShowCheckoutModal(true)
-    } catch (err) {
-      console.error('Order creation error:', err)
-      setError('Lỗi kết nối máy chủ khi tạo đơn hàng. Vui lòng thử lại!')
-    } finally {
-      setBuying(false)
-    }
+    setCreatedOrder(null)
+    setShowCheckoutModal(true)
   }
+
 
   const handleCopy = (text) => {
     navigator.clipboard.writeText(text)
@@ -211,7 +191,7 @@ export default function ProductDetailPage({ params }) {
             </p>
             <Link
               href="/shop"
-              className="shop-pill-btn shop-btn-violet text-xs"
+              className="shop-pill-btn shop-btn-accent text-xs"
             >
               ← Quay lại cửa hàng
             </Link>
@@ -317,7 +297,7 @@ export default function ProductDetailPage({ params }) {
                   >
                     <div className="text-base mb-1">💬</div>
                     <div className="text-[10px] text-muted-gray uppercase">Hỗ trợ</div>
-                    <div className="text-xs font-semibold text-shop-violet mt-0.5">Zalo / FB 24/7</div>
+                    <div className="text-xs font-semibold text-warm-accent mt-0.5">Zalo / FB 24/7</div>
                   </a>
                 </div>
               </div>
@@ -327,7 +307,7 @@ export default function ProductDetailPage({ params }) {
             <div className="lg:col-span-7 space-y-6" data-aos="fade-left" suppressHydrationWarning>
               {/* Product Header */}
               <div>
-                <span className="inline-block text-xs font-medium text-shop-violet mb-2">
+                <span className="inline-block text-xs font-medium text-warm-accent mb-2">
                   {currentGroup ? currentGroup.name : category.name}
                 </span>
                 <h1 className="text-2xl sm:text-3xl font-semibold tracking-shop-display text-ink-black leading-snug">
@@ -366,16 +346,16 @@ export default function ProductDetailPage({ params }) {
                   Chọn phiên bản / Gói cước ({groupVariants.length} lựa chọn)
                 </label>
 
-                {/* DÒNG THÔNG BÁO MÀU ĐỎ TO VÀ RÕ CHO SẢN PHẨM HẾT HÀNG */}
-                <div className="mb-4 p-4 rounded-2xl bg-red-50 border-2 border-red-400 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                {/* Calm Showroom Notice for Out of Stock items */}
+                <div className="mb-4 p-4 rounded-cards bg-canvas-mist/80 border border-faint-border shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div className="flex items-start gap-3">
-                    <span className="text-2xl flex-shrink-0 leading-none mt-0.5">📢</span>
+                    <span className="text-xl flex-shrink-0 leading-none mt-0.5">💬</span>
                     <div>
-                      <h3 className="text-sm sm:text-base font-extrabold text-red-600 uppercase tracking-wide">
-                        Đối với các sản phẩm / gói cước HẾT HÀNG:
+                      <h3 className="text-xs sm:text-sm font-semibold text-ink-black tracking-tight">
+                        Cần mua gói cước đang tạm hết hàng?
                       </h3>
-                      <p className="text-xs sm:text-sm font-bold text-red-700 mt-0.5">
-                        Quý khách có thể nhắn tin trực tiếp cho Admin để được hỗ trợ mua sớm nhất!
+                      <p className="text-xs text-muted-gray mt-0.5">
+                        Quý khách có thể nhắn tin trực tiếp để Admin hỗ trợ cấp slot riêng nhanh chóng.
                       </p>
                     </div>
                   </div>
@@ -384,15 +364,15 @@ export default function ProductDetailPage({ params }) {
                       href="https://zalo.me/0788836968"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 sm:flex-initial px-4 py-2 rounded-full bg-[#0068FF] text-white text-xs font-bold hover:brightness-110 transition-all flex items-center justify-center gap-1.5 shadow-sm"
+                      className="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-full bg-pure-white hover:bg-slate-50 text-ink-black border border-faint-border text-xs font-medium transition-all flex items-center justify-center gap-1.5 shadow-sm"
                     >
-                      <span>💬 Chat Zalo</span>
+                      <span>💬 Zalo</span>
                     </a>
                     <a
                       href="https://www.facebook.com/thanthan1011"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 sm:flex-initial px-4 py-2 rounded-full bg-[#1877F2] text-white text-xs font-bold hover:brightness-110 transition-all flex items-center justify-center gap-1.5 shadow-sm"
+                      className="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-full bg-pure-white hover:bg-slate-50 text-ink-black border border-faint-border text-xs font-medium transition-all flex items-center justify-center gap-1.5 shadow-sm"
                     >
                       <span>🌐 Facebook</span>
                     </a>
@@ -412,14 +392,14 @@ export default function ProductDetailPage({ params }) {
                         type="button"
                         onClick={() => handleSelectVariant(variant)}
                         className={`p-4 rounded-2xl border text-left flex flex-col justify-between gap-3 transition-all cursor-pointer ${isSelected
-                            ? 'bg-pure-white border-shop-violet shadow-sm ring-1 ring-shop-violet'
+                            ? 'bg-pure-white border-warm-accent shadow-sm ring-1 ring-warm-accent'
                             : 'bg-pure-white border-faint-border hover:border-black/20 shadow-sm'
-                          } ${!varAvailable ? 'bg-red-50/50 border-red-200 hover:border-red-300' : ''}`}
+                          } ${!varAvailable ? 'opacity-80 bg-canvas-mist/40' : ''}`}
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-2">
                             <span
-                              className={`w-4 h-4 rounded-full border flex items-center justify-center flex-shrink-0 ${isSelected ? 'border-shop-violet bg-shop-violet' : 'border-cool-stone'
+                              className={`w-4 h-4 rounded-full border flex items-center justify-center flex-shrink-0 ${isSelected ? 'border-warm-accent bg-warm-accent' : 'border-cool-stone'
                                 }`}
                             >
                               {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white"></span>}
@@ -427,7 +407,7 @@ export default function ProductDetailPage({ params }) {
                             <span className="text-xs font-semibold text-ink-black">{label}</span>
                           </div>
                           {isSelected && (
-                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-shop-violet text-white">
+                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-warm-accent text-white">
                               Đang chọn
                             </span>
                           )}
@@ -435,8 +415,8 @@ export default function ProductDetailPage({ params }) {
 
                         <div className="flex items-center justify-between text-xs pt-2 border-t border-faint-border">
                           <span className="font-bold text-ink-black">{formatCurrency(varPrice)}</span>
-                          <span className={`text-[11px] font-semibold ${!varAvailable ? 'text-red-600 font-bold' : 'text-muted-gray'}`}>
-                            {varAvailable ? (variant.available ? `Còn ${variant.available}` : 'Sẵn hàng') : '● Hết hàng (Nhắn Admin)'}
+                          <span className={`text-[11px] font-semibold ${!varAvailable ? 'text-muted-gray' : 'text-muted-gray'}`}>
+                            {varAvailable ? (variant.available ? `Còn ${variant.available}` : 'Sẵn hàng') : '● Tạm hết (Nhắn Admin)'}
                           </span>
                         </div>
                       </button>
@@ -479,7 +459,7 @@ export default function ProductDetailPage({ params }) {
                             <span className="text-[11px] text-muted-gray">Mỗi slot kích hoạt cho một tài khoản riêng</span>
                           </div>
                         </div>
-                        <span className="text-xs font-semibold text-shop-violet bg-shop-violet/10 px-3 py-1 rounded-full shrink-0">
+                        <span className="text-xs font-semibold text-warm-accent bg-accent-wash px-3 py-1 rounded-full shrink-0">
                           {quantity} slot
                         </span>
                       </div>
@@ -549,12 +529,13 @@ export default function ProductDetailPage({ params }) {
               )}
 
               {/* Order Checkout Bar */}
-              <div className="p-6 rounded-cards bg-pure-white border border-faint-border shadow-sm-2 space-y-5">
+              <div ref={buyBarRef} className="p-6 rounded-cards bg-pure-white border border-faint-border shadow-sm-2 space-y-5">
                 <div className="flex items-center justify-between gap-4">
                   {/* Quantity Counter Pill */}
                   <div className="flex items-center bg-canvas-mist border border-faint-border rounded-full p-1">
                     <button
                       type="button"
+                      aria-label="Giảm số lượng"
                       onClick={() => handleQuantityChange(quantity - 1)}
                       disabled={quantity <= 1 || !isAvailable}
                       className="w-8 h-8 rounded-full bg-pure-white hover:bg-slate-100 disabled:opacity-30 text-ink-black text-sm font-bold flex items-center justify-center transition-colors shadow-sm cursor-pointer"
@@ -564,6 +545,7 @@ export default function ProductDetailPage({ params }) {
                     <span className="px-4 text-sm font-semibold text-ink-black">{quantity}</span>
                     <button
                       type="button"
+                      aria-label="Tăng số lượng"
                       onClick={() => handleQuantityChange(quantity + 1)}
                       disabled={!isAvailable}
                       className="w-8 h-8 rounded-full bg-pure-white hover:bg-slate-100 disabled:opacity-30 text-ink-black text-sm font-bold flex items-center justify-center transition-colors shadow-sm cursor-pointer"
@@ -582,13 +564,13 @@ export default function ProductDetailPage({ params }) {
                 </div>
 
                 {/* Payment Method Badge */}
-                <div className="flex items-center justify-between px-4 py-2.5 rounded-full bg-shop-violet/5 border border-shop-violet/20 text-xs">
+                <div className="flex items-center justify-between px-4 py-2.5 rounded-full bg-accent-wash border border-warm-accent/20 text-xs">
                   <span className="text-muted-gray flex items-center gap-1.5">
                     <span>💳</span> Phương thức thanh toán:
                   </span>
-                  <span className="text-shop-violet font-semibold flex items-center gap-1">
+                  <span className="text-warm-accent font-semibold flex items-center gap-1">
                     <span>Quét mã VietQR 24/7</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-shop-violet"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-warm-accent"></span>
                   </span>
                 </div>
 
@@ -607,11 +589,11 @@ export default function ProductDetailPage({ params }) {
                         href="https://zalo.me/0788836968"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="shop-pill-btn bg-red-600 hover:bg-red-700 text-white w-full py-3.5 text-sm font-bold flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer"
+                        className="shop-pill-btn bg-slate-900 hover:bg-black text-white w-full py-3.5 text-sm font-semibold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
                       >
-                        <span>✕ Tạm hết hàng — Nhắn Zalo Admin để mua sớm ↗</span>
+                        <span>💬 Tạm hết hàng — Nhắn Zalo Admin hỗ trợ ↗</span>
                       </a>
-                      <p className="text-center text-xs font-bold text-red-600">
+                      <p className="text-center text-xs text-muted-gray">
                         * Gói cước đang tạm hết hàng. Quý khách vui lòng nhắn tin Zalo: 0788836968 để Admin kích hoạt riêng!
                       </p>
                     </div>
@@ -620,7 +602,7 @@ export default function ProductDetailPage({ params }) {
                       type="button"
                       disabled={buying}
                       onClick={handleBuy}
-                      className="shop-pill-btn shop-btn-violet w-full py-3.5 text-sm font-semibold shadow-lg-2 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                      className="shop-pill-btn shop-btn-accent w-full py-3.5 text-sm font-semibold shadow-lg-2 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                     >
                       {buying ? (
                         <>
@@ -672,7 +654,7 @@ export default function ProductDetailPage({ params }) {
                           setResult(null)
                           setQuantity(1)
                         }}
-                        className="shop-pill-btn shop-btn-violet flex-1 py-2 text-xs"
+                        className="shop-pill-btn shop-btn-accent flex-1 py-2 text-xs"
                       >
                         Mua tiếp
                       </button>
@@ -696,6 +678,72 @@ export default function ProductDetailPage({ params }) {
           </div>
         </div>
       </main>
+
+      {/* ================= MOBILE STICKY BUY BAR ================= */}
+      <aside
+        aria-label="Thanh mua hàng nhanh trên điện thoại"
+        className={`lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-pure-white/95 backdrop-blur-md border-t border-faint-border shadow-[0_-4px_24px_rgba(0,0,0,0.08)] px-4 py-2.5 transition-transform duration-300 ease-in-out font-sans ${
+          showStickyBar && !result ? 'translate-y-0' : 'translate-y-full pointer-events-none'
+        }`}
+      >
+        <div className="flex items-center justify-between gap-3 max-w-lg mx-auto">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-[#f5f6f7] flex items-center justify-center p-1.5 border border-faint-border shrink-0">
+              <ProductIcon
+                image={product.image || currentGroup?.image}
+                emoji={product.emoji || currentGroup?.emoji}
+                name={product.name}
+                size={28}
+                className="object-contain"
+              />
+            </div>
+            <div className="truncate">
+              <div className="text-xs font-semibold text-ink-black truncate tracking-shop-body">
+                {product.name}
+              </div>
+              <div className="text-xs font-bold text-warm-accent">
+                {formatCurrency(totalPrice)}
+                {quantity > 1 && (
+                  <span className="text-[10px] text-muted-gray font-normal ml-1">
+                    (x{quantity})
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="shrink-0">
+            {!isAvailable ? (
+              <a
+                href="https://zalo.me/0788836968"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shop-pill-btn bg-slate-900 text-white text-xs font-semibold py-2 px-3.5 shadow-sm inline-flex items-center gap-1 cursor-pointer"
+              >
+                💬 Nhắn Zalo
+              </a>
+            ) : (
+              <button
+                type="button"
+                disabled={buying}
+                onClick={handleBuy}
+                className="shop-pill-btn shop-btn-accent text-xs font-semibold py-2 px-4 shadow-lg-2 disabled:opacity-50 flex items-center gap-1.5 cursor-pointer active:scale-95"
+              >
+                {buying ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
+                    <span>Đang tạo...</span>
+                  </>
+                ) : !user ? (
+                  '🔐 Đăng nhập'
+                ) : (
+                  '⚡ Mua ngay'
+                )}
+              </button>
+            )}
+          </div>
+        </div>
+      </aside>
 
       {/* Direct VietQR Checkout Modal */}
       <DirectCheckoutModal

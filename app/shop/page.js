@@ -132,7 +132,7 @@ function ShopContent() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-faint-border mb-8 animate-fade-in-up">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-pure-white border border-faint-border shadow-sm text-ink-black mb-3">
-              <span className="w-2 h-2 rounded-full bg-shop-violet"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-warm-accent"></span>
               <span>Kho bản quyền tự động</span>
             </div>
             <h1 className="text-2xl sm:text-4xl font-semibold tracking-shop-display text-ink-black">
@@ -143,7 +143,7 @@ function ShopContent() {
             </p>
           </div>
 
-          {/* Search Box with Violet Submit */}
+          {/* Search Box with Warm Accent Submit */}
           <div className="w-full md:w-96">
             <SearchInput
               defaultValue={search}
@@ -169,7 +169,7 @@ function ShopContent() {
               Hiển thị <strong className="text-ink-black font-semibold">{Math.min(currentPage * PAGE_SIZE, filteredGroups.length)}</strong> / <strong className="text-ink-black font-semibold">{filteredGroups.length}</strong> sản phẩm
             </span>
             {selectedCategory !== 'all' && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-shop-violet/10 text-shop-violet text-[11px] font-medium animate-fade-in">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent-wash text-warm-accent text-[11px] font-medium animate-fade-in">
                 <span>Đang lọc: {SHOP_CATEGORIES.find((c) => c.id === selectedCategory)?.name || selectedCategory}</span>
                 <button
                   type="button"
@@ -191,9 +191,9 @@ function ShopContent() {
                 type="checkbox"
                 checked={onlyInStock}
                 onChange={(e) => setOnlyInStock(e.target.checked)}
-                className="w-4 h-4 rounded border-faint-border text-shop-violet focus:ring-0 cursor-pointer accent-shop-violet"
+                className="w-4 h-4 rounded border-faint-border text-warm-accent focus:ring-0 cursor-pointer accent-warm-accent"
               />
-              <span className="text-ink-black">Chỉ hiện còn hàng</span>
+              <span className="text-ink-black font-medium">Chỉ hiện còn hàng</span>
             </label>
 
             {/* Sort Dropdown */}
@@ -280,7 +280,7 @@ function ShopContent() {
                     onClick={() => { setCurrentPage(page); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
                     className={`w-9 h-9 rounded-full text-xs font-semibold transition-all ${
                       page === currentPage
-                        ? 'bg-shop-violet text-white shadow-sm'
+                        ? 'bg-warm-accent text-white shadow-sm'
                         : 'bg-pure-white border border-faint-border text-ink-black hover:bg-canvas-mist'
                     }`}
                   >

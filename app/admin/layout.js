@@ -170,6 +170,7 @@ export default function AdminLayout({ children }) {
   const navItems = [
     { href: '/admin', label: '📊 Tổng quan', exact: true },
     { href: '/admin/orders', label: '📦 Quản lý đơn hàng', exact: false },
+    { href: '/admin/products', label: '🏷️ Quản lý giá', exact: false },
     { href: '/admin/deposits', label: '💰 Lịch sử nạp tiền', exact: false },
     { href: '/admin/users', label: '👥 Quản lý thành viên', exact: false },
   ]
